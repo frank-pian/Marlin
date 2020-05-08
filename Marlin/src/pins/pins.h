@@ -516,6 +516,8 @@
   #include "stm32f1/pins_MKS_ROBIN_LITE3.h"     // STM32F1                                env:mks_robin_lite3
 #elif MB(MKS_ROBIN_PRO)
   #include "stm32f1/pins_MKS_ROBIN_PRO.h"       // STM32F1                                env:mks_robin_pro
+#elif MB(IVI_CONTROLLER)
+  #include "stm32f1/pins_IVI_CONTROLLER.h"        // STM32F1                                env:ivi3d_v1
 
 //
 // ARM Cortex-M4F
