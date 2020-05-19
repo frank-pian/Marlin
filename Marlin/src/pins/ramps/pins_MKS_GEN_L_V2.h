@@ -69,9 +69,9 @@
 #define E0_DIAG_PIN                            2
 #define E1_DIAG_PIN                           15
 
-#ifndef SERVO1_PIN
-  #define SERVO1_PIN                          12
-#endif
+// #ifndef SERVO1_PIN
+//   #define SERVO1_PIN                          12
+// #endif
 #ifndef SERVO2_PIN
   #define SERVO2_PIN                          39
 #endif
@@ -85,5 +85,9 @@
 #ifndef E1_SERIAL_RX_PIN
   #define E1_SERIAL_RX_PIN                    21
 #endif
+
+#define SPINDLE_LASER_ENA_PIN                 45
+#define SPINDLE_LASER_PWM_PIN                 5
+
 
 #include "pins_RAMPS.h"
