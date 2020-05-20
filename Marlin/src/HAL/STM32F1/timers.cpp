@@ -101,7 +101,32 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
       timer_generate_update(TEMP_TIMER_DEV);
       timer_resume(TEMP_TIMER_DEV);
       break;
+    case SPINDLE_TIMER_NUM:
+      timer_pause(SPINDLE_TIMER_DEV);
+      timer_set_mode(SPINDLE_TIMER_DEV, SPINDLE_TIMER_CHAN, TIMER_PWM);
+      timer_set_count(SPINDLE_TIMER_DEV, 0);
+      timer_set_prescaler(SPINDLE_TIMER_DEV, (uint16_t)(SPINDLE_TIMER_PRESCALE - 1));
+      timer_set_reload(SPINDLE_TIMER_DEV, 0xFFFF);
+      timer_set_compare(SPINDLE_TIMER_DEV, SPINDLE_TIMER_CHAN, _MIN(hal_timer_t(HAL_TIMER_TYPE_MAX), (F_CPU) / (SPINDLE_TIMER_PRESCALE) / frequency));
+      // timer_attach_interrupt(SPINDLE_TIMER_DEV, SPINDLE_TIMER_CHAN, tempTC_Handler);
+      // nvic_irq_set_priority(irq_num, TEMP_TIMER_IRQ_PRIO);
+      timer_generate_update(SPINDLE_TIMER_DEV);
+      timer_resume(SPINDLE_TIMER_DEV);
+
+      break;
   }
+}
+
+void timer4_init(uint32_t frequency)
+{
+      gpio_set_mode(PIN_MAP[SPINDLE_LASER_PWM_PIN].gpio_device, PIN_MAP[SPINDLE_LASER_PWM_PIN].gpio_bit, GPIO_AF_OUTPUT_PP);
+      timer_set_mode(&timer4,  1, TIMER_PWM);
+      timer_set_count(&timer4, (F_CPU) / (720 - 1) / frequency);
+      timer_set_prescaler(&timer4, (uint16_t)(720 - 1));  // 10KHz
+      timer_set_reload(&timer4, (F_CPU) / (720 - 1) / frequency);
+      timer_set_compare(&timer4, 1, 1000);
+      timer_resume(&timer4);
+      timer_generate_update(&timer4);
 }
 
 void HAL_timer_enable_interrupt(const uint8_t timer_num) {
@@ -179,3 +204,4 @@ timer_dev* get_timer_dev(int number) {
 }
 
 #endif // __STM32F1__
+

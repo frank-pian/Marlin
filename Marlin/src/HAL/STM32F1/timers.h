@@ -46,6 +46,7 @@ typedef uint16_t hal_timer_t;
 
 #define STEP_TIMER_CHAN 1 // Channel of the timer to use for compare and interrupts
 #define TEMP_TIMER_CHAN 1 // Channel of the timer to use for compare and interrupts
+#define SPINDLE_TIMER_CHAN 2 // Channel of the timer to use for pwm
 
 /**
  * Note: Timers may be used by platforms and libraries
@@ -66,7 +67,8 @@ typedef uint16_t hal_timer_t;
 #else
   #define STEP_TIMER_NUM 5 // for other boards, five is fine.
 #endif
-#define TEMP_TIMER_NUM 2    // index of timer to use for temperature
+#define SPINDLE_TIMER_NUM 3
+#define TEMP_TIMER_NUM    2    // index of timer to use for temperature
 //#define TEMP_TIMER_NUM 4  // 2->4, Timer 2 for Stepper Current PWM
 #define PULSE_TIMER_NUM STEP_TIMER_NUM
 
@@ -95,10 +97,13 @@ typedef uint16_t hal_timer_t;
 #define PULSE_TIMER_PRESCALE   STEPPER_TIMER_PRESCALE
 #define PULSE_TIMER_TICKS_PER_US STEPPER_TIMER_TICKS_PER_US
 
+#define SPINDLE_TIMER_PRESCALE     1000 // prescaler for setting spindle timer, 72Khz
+
 timer_dev* get_timer_dev(int number);
 #define TIMER_DEV(num) get_timer_dev(num)
 #define STEP_TIMER_DEV TIMER_DEV(STEP_TIMER_NUM)
 #define TEMP_TIMER_DEV TIMER_DEV(TEMP_TIMER_NUM)
+#define SPINDLE_TIMER_DEV TIMER_DEV(SPINDLE_TIMER_NUM)
 
 #define ENABLE_STEPPER_DRIVER_INTERRUPT() timer_enable_irq(STEP_TIMER_DEV, STEP_TIMER_CHAN)
 #define DISABLE_STEPPER_DRIVER_INTERRUPT() timer_disable_irq(STEP_TIMER_DEV, STEP_TIMER_CHAN)
@@ -154,6 +159,9 @@ FORCE_INLINE static void HAL_timer_set_compare(const uint8_t timer_num, const ha
     break;
   case TEMP_TIMER_NUM:
     timer_set_compare(TEMP_TIMER_DEV, TEMP_TIMER_CHAN, compare);
+    break;
+  case SPINDLE_TIMER_NUM:
+    timer_set_compare(SPINDLE_TIMER_DEV, SPINDLE_TIMER_CHAN, compare);
     break;
   }
 }
