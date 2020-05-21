@@ -350,3 +350,7 @@
 #define ESP_WIFI_MODULE_BAUDRATE        BAUDRATE  // Must use same BAUDRATE as SERIAL_PORT & SERIAL_PORT_2
 #define ESP_WIFI_MODULE_RESET_PIN           -1
 #define ESP_WIFI_MODULE_ENABLE_PIN          PG1
+
+#define SPINDLE_LASER_ENA_PIN    PC1   // digital pin
+#define SPINDLE_LASER_PWM_PIN    PC_9   // digital pin - MUST BE HARDWARE PWM
+#define SPINDLE_DIR_PIN          PG14   // digital pin
