@@ -52,7 +52,8 @@ public:
       #if ENABLED(CUTTER_POWER_RELATIVE)
         return (pwr - SPEED_POWER_MIN) / (SPEED_POWER_MAX - SPEED_POWER_MIN) * 255;     // using rpm range as relative percentage
       #else
-        return (pwr / SPEED_POWER_MAX) * 255;
+        // return (pwr / SPEED_POWER_MAX) * 255;
+        return power;
       #endif
     #endif
   }

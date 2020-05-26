@@ -60,9 +60,9 @@ void tim11_init(uint32_t frequency)
 
   LL_APB2_GRP1_EnableClock(RCC_APB2ENR_TIM11EN);
 
-  TIM_InitStruct.Prescaler = 720;
+  TIM_InitStruct.Prescaler = 1680;
   TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-  TIM_InitStruct.Autoreload = (F_CPU)/(720 - 1)/(frequency);
+  TIM_InitStruct.Autoreload = (F_CPU)/(1680 - 1)/(frequency);
   TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
   LL_TIM_Init(TIM11, &TIM_InitStruct);
   LL_TIM_EnableARRPreload(TIM11);
@@ -71,7 +71,7 @@ void tim11_init(uint32_t frequency)
   TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_PWM1;
   TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_ENABLE;
   TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-  TIM_OC_InitStruct.CompareValue = 1000;
+  TIM_OC_InitStruct.CompareValue = 80;
   TIM_OC_InitStruct.OCPolarity = LL_TIM_OCPOLARITY_HIGH;
   LL_TIM_OC_Init(TIM11, LL_TIM_CHANNEL_CH1, &TIM_OC_InitStruct);
   LL_TIM_OC_EnableFast(TIM11, LL_TIM_CHANNEL_CH1);
@@ -92,7 +92,7 @@ void tim11_init(uint32_t frequency)
 // Init the cutter to a safe OFF state
 //
 void SpindleLaser::init() {
-  // OUT_WRITE(SPINDLE_LASER_ENA_PIN, !SPINDLE_LASER_ACTIVE_HIGH); // Init spindle to off
+  OUT_WRITE(SPINDLE_LASER_ENA_PIN, !SPINDLE_LASER_ACTIVE_HIGH); // Init spindle to off
   // #if ENABLED(SPINDLE_CHANGE_DIR)
   //   OUT_WRITE(SPINDLE_DIR_PIN, SPINDLE_INVERT_DIR ? 255 : 0);   // Init rotation to clockwise (M3)
   // #endif
@@ -119,9 +119,14 @@ void SpindleLaser::init() {
   * Set the cutter PWM directly to the given ocr value
   **/
   void SpindleLaser::set_ocr(const uint8_t ocr) {
-    // WRITE(SPINDLE_LASER_ENA_PIN, SPINDLE_LASER_ACTIVE_HIGH); // turn spindle on
+    if (ocr != 0) {
+    uint32_t value = (ocr * 120 / 255) + 80;
+    WRITE(SPINDLE_LASER_ENA_PIN, SPINDLE_LASER_ACTIVE_HIGH); // turn spindle on
     // analogWrite(pin_t(SPINDLE_LASER_PWM_PIN), ocr ^ SPINDLE_LASER_PWM_OFF);
-    LL_TIM_OC_SetCompareCH1(TIM11, ocr * 4000 / 255);
+    LL_TIM_OC_SetCompareCH1(TIM11, value);  // duty: 4%-10% : 80-200
+    } else {
+      LL_TIM_OC_SetCompareCH1(TIM11, 0);  
+    }
   }
 
 #endif
