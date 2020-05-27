@@ -88,6 +88,12 @@ void tim11_init(uint32_t frequency)
   LL_TIM_CC_EnableChannel(TIM11, LL_TIM_CHANNEL_CH1);
 }
 
+  void ms_sleep(uint32_t ms)
+  {
+    ms += millis();
+    while(PENDING(millis(), ms));
+  }
+
 //
 // Init the cutter to a safe OFF state
 //
@@ -119,14 +125,19 @@ void SpindleLaser::init() {
   * Set the cutter PWM directly to the given ocr value
   **/
   void SpindleLaser::set_ocr(const uint8_t ocr) {
-    if (ocr != 0) {
-    uint32_t value = (ocr * 120 / 255) + 80;
+    uint32_t value = 0;
+    static uint32_t old_pwm = 80;
+    uint32_t target = (ocr * 120 / 255) + 80;
     WRITE(SPINDLE_LASER_ENA_PIN, SPINDLE_LASER_ACTIVE_HIGH); // turn spindle on
-    // analogWrite(pin_t(SPINDLE_LASER_PWM_PIN), ocr ^ SPINDLE_LASER_PWM_OFF);
-    LL_TIM_OC_SetCompareCH1(TIM11, value);  // duty: 4%-10% : 80-200
-    } else {
-      LL_TIM_OC_SetCompareCH1(TIM11, 0);  
+
+    for (value = old_pwm; value <= target;) {
+      LL_TIM_OC_SetCompareCH1(TIM11, value);
+      value += 2;
+      ms_sleep(50);
     }
+    
+    LL_TIM_OC_SetCompareCH1(TIM11, target);  // duty: 4%-10% : 80-200
+    old_pwm = target;
   }
 
 #endif
