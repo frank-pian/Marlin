@@ -886,6 +886,12 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 7219: M7219(); break;                                // M7219: Set LEDs, columns, and rows
       #endif
 
+      case 2051: M2051(); break;
+
+      case 2060: M2060(); break;
+
+      case 2061: M2061(); break;
+
       default: parser.unknown_command_warning(); break;
     }
     break;
