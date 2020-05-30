@@ -52,65 +52,65 @@
 //
 // Limit Switches
 //
-#define X_MIN_PIN                           PC13
-#define X_MAX_PIN                           PA15
-#define Y_MIN_PIN                           PA5
-#define Y_MAX_PIN                           PD12
-#define Z_MIN_PIN                           PD14
-#define Z_MAX_PIN                           PD15
+// #define X_MIN_PIN                           PC13
+#define X_MAX_PIN                           PE9
+// #define Y_MIN_PIN                           PA5
+#define Y_MAX_PIN                           PE10
+// #define Z_MIN_PIN                           PD14
+#define Z_MAX_PIN                           PB8
 
 //
 // Steppers
 //
 #define X_STEP_PIN                          PC4
-#define X_DIR_PIN                           PA4
-#define X_ENABLE_PIN                        PE7
+#define X_DIR_PIN                           PC5
+#define X_ENABLE_PIN                        PB0
 
-#define Y_STEP_PIN                          PE5
-#define Y_DIR_PIN                           PE2
-#define Y_ENABLE_PIN                        PE6
+#define Y_STEP_PIN                          PB1
+#define Y_DIR_PIN                           PE7
+#define Y_ENABLE_PIN                        PE8
 
-#define Z_STEP_PIN                          PD5
-#define Z_DIR_PIN                           PD3
-#define Z_ENABLE_PIN                        PD6
+#define Z_STEP_PIN                          PB9
+#define Z_DIR_PIN                           PE0
+#define Z_ENABLE_PIN                        PE1
 
-#define E0_STEP_PIN                         PD7
-#define E0_DIR_PIN                          PD0
-#define E0_ENABLE_PIN                       PB9
+#define E0_STEP_PIN                         PE11
+#define E0_DIR_PIN                          PE12
+#define E0_ENABLE_PIN                       PE13
 
-#define E1_STEP_PIN                         PE0
-#define E1_DIR_PIN                          PE1
-#define E1_ENABLE_PIN                       PB8
+// #define E1_STEP_PIN                         PE0
+// #define E1_DIR_PIN                          PE1
+// #define E1_ENABLE_PIN                       PB8
 
 //
 // Temperature Sensors
 //
-#define TEMP_0_PIN                          PC0   // T0
-#define TEMP_1_PIN                          PC1   // T1
-#define TEMP_BED_PIN                        PC2   // TB
+#define TEMP_0_PIN                          PA1   // T0
+// #define TEMP_1_PIN                          PA1   // T1
+#define TEMP_BED_PIN                        PA0   // TB
 
-#ifndef TEMP_CHAMBER_PIN
-  #define TEMP_CHAMBER_PIN                  PC3   // TC
-#endif
+// #ifndef TEMP_CHAMBER_PIN
+//   #define TEMP_CHAMBER_PIN                  PC3   // TC
+// #endif
 
 //
 // Heaters / Fans
 //
-#define HEATER_0_PIN                        PA2   // Heater0
-#define HEATER_1_PIN                        PA3   // Heater1
-#define HEATER_BED_PIN                      PA1   // Hotbed
+#define HEATER_0_PIN                        PE5   // Heater0
+// #define HEATER_1_PIN                        PA3   // Heater1
+#define HEATER_BED_PIN                      PE4   // Hotbed
 
-#define FAN_PIN                             PE9   // Fan0
-#define FAN1_PIN                            PE11  // Fan1
-#define FAN2_PIN                            PE13  // Fan2
-#define FAN3_PIN                            PE14  // Fan3
+#define FAN_PIN                             PA5   // Fan0
+// #define FAN1_PIN                            PE11  // Fan1
+// #define FAN2_PIN                            PE13  // Fan2
+// #define FAN3_PIN                            PE14  // Fan3
 
 //
 // Misc. Functions
 //
 #define LED_PIN                             PA6
 //#define LED_PIN                           PA7
-#define KILL_PIN                            PB1
+// #define KILL_PIN                            PB1
 
 //
 // LCD / Controller
@@ -135,16 +135,16 @@
 //
 // Onboard SD support
 //
-#define SDIO_D0_PIN                         PC8
-#define SDIO_D1_PIN                         PC9
-#define SDIO_D2_PIN                         PC10
-#define SDIO_D3_PIN                         PC11
-#define SDIO_CK_PIN                         PC12
-#define SDIO_CMD_PIN                        PD2
+// #define SDIO_D0_PIN                         PC8
+// #define SDIO_D1_PIN                         PC9
+// #define SDIO_D2_PIN                         PC10
+// #define SDIO_D3_PIN                         PC11
+// #define SDIO_CK_PIN                         PC12
+// #define SDIO_CMD_PIN                        PD2
 
-#ifndef SDCARD_CONNECTION
-  #define SDCARD_CONNECTION              ONBOARD
-#endif
+// #ifndef SDCARD_CONNECTION
+//   #define SDCARD_CONNECTION              ONBOARD
+// #endif
 
 #if SD_CONNECTION_IS(ONBOARD)
   #define SDIO_SUPPORT                            // Use SDIO for onboard SD
@@ -157,3 +157,6 @@
     #define MOSI_PIN                SDIO_CMD_PIN
   #endif
 #endif
+
+#define SPINDLE_LASER_ENA_PIN         PD13
+#define SPINDLE_LASER_PWM_PIN         PD14

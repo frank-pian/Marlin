@@ -306,7 +306,7 @@ extern "C" {
 
 // UART Definitions
 // Define here Serial instance number to map on Serial generic name
-#define SERIAL_UART_INSTANCE    1 //ex: 2 for Serial2 (USART2)
+#define SERIAL_UART_INSTANCE    2 //ex: 2 for Serial2 (USART2)
 // DEBUG_UART could be redefined to print on another instance than 'Serial'
 //#define DEBUG_UART              ((USART_TypeDef *) U(S)ARTX) // ex: USART3
 // DEBUG_UART baudrate, default: 9600 if not defined
@@ -316,8 +316,11 @@ extern "C" {
 
 // Default pin used for 'Serial' instance (ex: ST-Link)
 // Mandatory for Firmata
-#define PIN_SERIAL_RX           PA10
-#define PIN_SERIAL_TX           PA9
+// #define PIN_SERIAL_RX           PA10
+// #define PIN_SERIAL_TX           PA9
+
+#define PIN_SERIAL2_RX          PD6
+#define PIN_SERIAL2_TX          PD5
 
 /* Extra HAL modules */
 #define HAL_DAC_MODULE_ENABLED
