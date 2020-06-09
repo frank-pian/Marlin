@@ -1,6 +1,7 @@
 #include "../../gcode.h"
 #include "../../module/endstops.h"
 
+//获取自检信息
 void GcodeSuite::M2060() {
 
   SERIAL_ECHOLNPGM_P("sensor: XMotor:ok YMotor:ok ZMotor:ok XLimit:ok YLimit:ok ZLimit:ok Fans:ok Door:ok TempHumi:ok ToolHead:ok");

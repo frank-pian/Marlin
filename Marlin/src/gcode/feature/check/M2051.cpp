@@ -5,6 +5,6 @@
 
 void GcodeSuite::M2051() {
 
-  SERIAL_ECHOLNPGM_P("info: Head 3DP,0.3mm");
+  SERIAL_ECHOLNPGM_P("info:Head 3DP,0.3mm");
 
 }
