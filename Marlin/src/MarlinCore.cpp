@@ -715,7 +715,7 @@ void idle(TERN_(ADVANCED_PAUSE_FEATURE, bool no_stepper_sleep/*=false*/)) {
   TERN_(USE_BEEPER, buzzer.tick());
 
   // Read Buttons and Update the LCD
-  ui.update();
+  //ui.update();
 
   // Run i2c Position Encoders
   #if ENABLED(I2C_POSITION_ENCODERS)
