@@ -214,3 +214,27 @@ uint16_t HAL_adc_get_result();
 
 #define PLATFORM_M997_SUPPORT
 void flashFirmware(const int16_t);
+
+/************************** CAN *****************************/
+void CAN2_RX0_IRQHandler(void);
+float hx710_analog_to_weigh(uint32_t time);
+void sht20_update(void);
+void sht20_get_value(float *temp, float *hum);
+
+uint8_t can_read_boardtype(void);
+uint16_t can_read_temperature(void);
+void can_temp_update(void);
+uint16_t can_read_mpu6500(void);
+
+void can_set_freq(uint16_t freq, uint16_t duty);
+void can_set_pwm(uint8_t duty);
+void can_set_headpwr_en(uint8_t enable);
+void can_set_headfan_en(uint8_t enable);
+void can_set_modelfan_en(uint8_t enable);
+void can_set_zpro_en(uint8_t enable);
+void can_set_target_temperature(int16_t temp);
+
+int encoder_get_statue(void);
+void encoder_enable(void);
+void encoder_update(void);
+int encoder_get_value(void);
