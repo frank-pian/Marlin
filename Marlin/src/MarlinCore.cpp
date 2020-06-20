@@ -1197,6 +1197,8 @@ void setup() {
 
   marlin_state = MF_RUNNING;
 
+  can_read_boardtype();
+
   SETUP_LOG("setup() completed.");
 }
 
