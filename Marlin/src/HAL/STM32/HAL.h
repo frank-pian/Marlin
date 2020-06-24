@@ -119,6 +119,7 @@
   #define DGUS_SERIAL_GET_TX_BUFFER_FREE DGUS_SERIAL.availableForWrite
 #endif
 
+#include "timers.h"
 
 /**
  * TODO: review this to return 1 for pins that are not analog input
@@ -221,10 +222,12 @@ float hx710_analog_to_weigh(uint32_t time);
 void sht20_update(void);
 void sht20_get_value(float *temp, float *hum);
 
+uint8_t headtype(void);
 uint8_t can_read_boardtype(void);
-uint16_t can_read_temperature(void);
+float can_read_temperature(void);
 void can_temp_update(void);
 uint16_t can_read_mpu6500(void);
+uint8_t can_read_zpro(void);
 
 void can_set_freq(uint16_t freq, uint16_t duty);
 void can_set_pwm(uint8_t duty);

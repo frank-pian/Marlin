@@ -45,7 +45,7 @@
 // Public Variables
 // ------------------------
 
-uint16_t HAL_adc_result;
+uint16_t HAL_adc_result;  
 
 // ------------------------
 // Public functions
@@ -91,8 +91,7 @@ void HAL_init() {
   SHT20I2C_Init();
   CAN2_Init();
   misc_pin_init();
-
-  TERN_(EMERGENCY_PARSER, USB_Hook_init());
+  // can_read_boardtype();
 }
 
 void HAL_clear_reset_source() { __HAL_RCC_CLEAR_RESET_FLAGS(); }
@@ -189,14 +188,14 @@ uint32_t get_hx711_value(void)
 		us_delay(10);
 		PD_SCK(0);
     us_delay(3);
+		count <<= 1;
 		if (PD_DAT_RD())
 			count++;
 		us_delay(10);
-		count <<= 1;
 	}
 	PD_SCK(1);
 	us_delay(10);
-	// count = count ^ 0x800000;
+	count = count ^ 0x800000;
 	PD_SCK(0);
 	return count;
 }
@@ -218,7 +217,7 @@ float hx710_analog_to_weigh(uint32_t time)
   }
 
   // weight = ((float)weight_sum) / ((float)time) * 0.00053 - 284; // 2KG bridge
-  weight = ((float)weight_sum) / ((float)time) * 0.000965 - 7995.5; // 1KG bridge
+  weight = ((float)weight_sum) / ((float)time) * 0.000919 - 7700.0; // 1KG bridge
 
   return weight;
 }
@@ -472,6 +471,8 @@ void sht20_get_value(float *temp, float *hum)
 // can bus
 #include "stm32f4xx_hal_can.h"
 
+#define CAN_TIMEOUT   (10)
+
 CAN_RxHeaderTypeDef rx_msg;
 uint8_t rx_data[8] = {0};
 CAN_HandleTypeDef hcan2;
@@ -484,11 +485,11 @@ uint8_t status_flag = 0;
 uint8_t head_temperature_flag = 0;
 uint8_t mpu6500_flag = 0;
 
-uint8_t z_pro = 0;
+volatile uint8_t z_pro = 0;
 uint8_t z_pro_int = 0;
 uint8_t status = 0;
 uint8_t board_type = 0;
-uint16_t head_temperature = 0;
+float head_temperature = 0;
 int16_t mpu6500[3] = {0};
 
 
@@ -529,25 +530,31 @@ void CAN2_Init(void)
   
   // HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO0_MSG_PENDING);
   
-  // NVIC_SetPriority(CAN2_RX0_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),14, 0));
+  // NVIC_SetPriority(CAN2_RX0_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
   // NVIC_EnableIRQ(CAN2_RX0_IRQn);
+  // HAL_NVIC_SetPriority(CAN2_RX0_IRQn, 0, 0);
+  // HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn);
 }
 
 void can_parser(void);
 void CAN2_RX0_IRQHandler(void)
 {
-  HAL_CAN_IRQHandler(&hcan2);
-  HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &rx_msg, rx_data);
-  can_parser();
+  // HAL_CAN_IRQHandler(&hcan2);
+  // HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &rx_msg, rx_data);
+  // can_parser();
 }
 
 void can_update(void)
 {
-  uint32_t count = hcan2.Instance->RF0R;
-  while(count--) {
+  volatile  uint32_t count = hcan2.Instance->RF0R;
+  // serial_echopair_PGM("can_update count ", count);
+  if (!count) return;
+  do {
+    // __disable_irq();
     HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &rx_msg, rx_data);
     can_parser();
-  }
+    // __enable_irq();
+  } while(count--);
 }
 
 int CAN2_Send_Msg(uint8_t *tx_data, uint8_t len)
@@ -573,6 +580,11 @@ int CAN2_Send_Msg(uint8_t *tx_data, uint8_t len)
 	return 0;
 }
 
+uint8_t headtype(void)
+{
+  return board_type;
+}
+
 uint8_t can_read_boardtype(void)
 {
   int count = 0;
@@ -581,7 +593,7 @@ uint8_t can_read_boardtype(void)
   board_type_flag = 0;
   while(hcan2.Instance->RF0R == 0) {
     count++;
-    if (count >= 500) {
+    if (count >= CAN_TIMEOUT) {
       can_timeout++;
       return board_type;
     }
@@ -601,7 +613,7 @@ uint8_t can_read_status(void)
   CAN2_Send_Msg(&data, 1);
   while(hcan2.Instance->RF0R == 0) {
     count++;
-    if (count >= 500) {
+    if (count >= CAN_TIMEOUT) {
       can_timeout++;
       return status;
     }
@@ -613,14 +625,15 @@ uint8_t can_read_status(void)
   return 0;
 }
 
-uint16_t can_read_temperature(void)
+float can_read_temperature(void)
 {
+  float temp = 0.0;
   // int count = 0;
   // uint8_t data = 0xA2;
   // CAN2_Send_Msg(&data, 1);
   // while(hcan2.Instance->RF0R == 0) {
   //   count++;
-  //   if (count >= 500) {
+  //   if (count >= CAN_TIMEOUT) {
   //     can_timeout++;
   //     return head_temperature;
   //   }
@@ -628,13 +641,14 @@ uint16_t can_read_temperature(void)
   // can_update();
   // if (head_temperature_flag)
   //   return head_temperature;
-  return 25;
+  temp = (float)head_temperature;
+  return temp;
 }
 
 void can_temp_update(void)
 {
   // if (board_type == 0x03) {
-  //   head_temperature = 25;
+  //   head_temperature = -10;
   //   return;
   // }
   int count = 0;
@@ -642,7 +656,7 @@ void can_temp_update(void)
   CAN2_Send_Msg(&data, 1);
   while(hcan2.Instance->RF0R == 0) {
     count++;
-    if (count >= 500) {
+    if (count >= CAN_TIMEOUT) {
       can_timeout++;
     }
   }
@@ -656,7 +670,7 @@ uint16_t can_read_mpu6500(void)
   CAN2_Send_Msg(&data, 1);
   while(hcan2.Instance->RF0R == 0) {
     count++;
-    if (count >= 500) {
+    if (count >= CAN_TIMEOUT) {
       can_timeout++;
       return mpu6500[0];
     }
@@ -667,22 +681,55 @@ uint16_t can_read_mpu6500(void)
   return 0;
 }
 
-uint16_t can_read_zpro(void)
+uint8_t can_read_zpro(void)
+{
+  volatile int count = 0;
+  uint8_t data = 0xA6;
+  z_pro_flag = 0;
+  can_update();
+  CAN2_Send_Msg(&data, 1);
+  while((hcan2.Instance->RF0R == 0))
+  {
+    count++;
+    if (count >= CAN_TIMEOUT) {
+        return z_pro;
+    }
+  }
+  while(hcan2.Instance->RF0R == 0);
+  for (count = 0; count > CAN_TIMEOUT; count++) {
+    if (hcan2.Instance->RF0R != 0) {
+        break;
+     }
+  }
+  if (count >= CAN_TIMEOUT) {
+      can_timeout++;
+      return z_pro;
+  }
+  can_update();
+  return z_pro;
+}
+
+uint8_t can_read_zproxxx(void)
 {
   int count = 0;
   uint8_t data = 0xA6;
+  z_pro_flag = 0;
   CAN2_Send_Msg(&data, 1);
   while(hcan2.Instance->RF0R == 0) {
     count++;
-    if (count >= 500) {
+    if (count >= CAN_TIMEOUT) {
         can_timeout++;
         return z_pro;
       }
   }
-  can_update();
-  if (z_pro_flag)
-    return z_pro;
-  return 0;
+
+  if (hcan2.Instance->RF0R) { 
+    HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &rx_msg, rx_data);
+    if (rx_data[0] == 0xA6)
+      z_pro = rx_data[1];
+  }
+
+  return z_pro;
 }
 
 void can_parser(void)
@@ -699,7 +746,8 @@ void can_parser(void)
       break;
     }
     case 0xA2: {  // read head temperature
-      head_temperature = rx_data[1] | (rx_data[2] << 8);
+      // head_temperature = rx_data[1] | (rx_data[2] << 8);
+      memcpy(&head_temperature, &rx_data[1], 4);
       head_temperature_flag = 1;
       break;
     }
@@ -765,9 +813,9 @@ void can_set_headfan_en(uint8_t enable)
 {
   static uint8_t status = false;
   if ((!!enable) == status) {
-    return;
+    // return;
   }
-  status = !!enable;
+  // status = !!enable;
   uint8_t data[8] = {0};
   data[0] = 0xB3;
   data[1] = enable & 0xff;
@@ -778,9 +826,9 @@ void can_set_modelfan_en(uint8_t enable)
 {
   static uint8_t status = false;
   if ((!!enable) == status) {
-    return;
+    // return;
   }
-  status = !!enable;
+  // status = !!enable;
   uint8_t data[8] = {0};
   data[0] = 0xB4;
   data[1] = enable & 0xff;
