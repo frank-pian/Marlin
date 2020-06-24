@@ -45,6 +45,24 @@
 
 #define TEMP_TIMER_FREQUENCY 1000   // Temperature::isr() is expected to be called at around 1kHz
 
+#ifdef STM32F0xx
+  #define HAL_TIMER_RATE (F_CPU)      // Frequency of timer peripherals
+  #define MCU_STEP_TIMER 16
+  #define MCU_TEMP_TIMER 17
+#elif defined(STM32F1xx)
+  #define HAL_TIMER_RATE (F_CPU)
+  #define MCU_STEP_TIMER  4
+  #define MCU_TEMP_TIMER  2
+#elif defined(STM32F401xC) || defined(STM32F401xE)
+  #define HAL_TIMER_RATE (F_CPU / 2)
+  #define MCU_STEP_TIMER  9
+  #define MCU_TEMP_TIMER 10
+#elif defined(STM32F4xx) || defined(STM32F7xx)
+  #define HAL_TIMER_RATE (F_CPU / 2)
+  #define MCU_STEP_TIMER  6           // STM32F401 has no TIM6, TIM7, or TIM8
+  #define MCU_TEMP_TIMER 14           // TIM7 is consumed by Software Serial if used.
+#endif
+
 // TODO: get rid of manual rate/prescale/ticks/cycles taken for procedures in stepper.cpp
 #define STEPPER_TIMER_RATE 2000000 // 2 Mhz
 #define STEPPER_TIMER_PRESCALE ((HAL_TIMER_RATE)/(STEPPER_TIMER_RATE))
