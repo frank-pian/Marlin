@@ -41,7 +41,8 @@
 
 //#define I2C_EEPROM
 //#define E2END 0x1FFF                            // 8KB
-#define SRAM_EEPROM_EMULATION
+//#define SRAM_EEPROM_EMULATION
+#define FLASH_EEPROM_EMULATION                  // Use Flash-based EEPROM emulation
 
 //
 // Servos
