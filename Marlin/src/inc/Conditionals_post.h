@@ -2012,7 +2012,8 @@
  * Helper Macros for heaters and extruder fan
  */
 
-#define WRITE_HEATER_0P(v) WRITE(HEATER_0_PIN, (v) ^ HEATER_0_INVERTING)
+// #define WRITE_HEATER_0P(v) WRITE(HEATER_0_PIN, (v) ^ HEATER_0_INVERTING)
+#define WRITE_HEATER_0P(v) can_set_headpwr_en((v) ^ HEATER_0_INVERTING)
 #if EITHER(HAS_MULTI_HOTEND, HEATERS_PARALLEL)
   #define WRITE_HEATER_1(v) WRITE(HEATER_1_PIN, (v) ^ HEATER_1_INVERTING)
   #if HOTENDS > 2
@@ -2102,7 +2103,8 @@
 
 #if FAN_COUNT > 0
   #define HAS_FAN 1
-  #define WRITE_FAN(n, v) WRITE(FAN##n##_PIN, (v) ^ FAN_INVERTING)
+  // #define WRITE_FAN(n, v) WRITE(FAN##n##_PIN, (v) ^ FAN_INVERTING)
+  #define WRITE_FAN(n, v) do{;}while(0)
 #endif
 
 /**

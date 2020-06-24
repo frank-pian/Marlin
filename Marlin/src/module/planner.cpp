@@ -1370,9 +1370,11 @@ void Planner::check_axes_activity() {
     #elif ENABLED(FAST_PWM_FAN)
       #define _FAN_SET(F) set_pwm_duty(FAN##F##_PIN, CALC_FAN_SPEED(F));
     #else
-      #define _FAN_SET(F) analogWrite(pin_t(FAN##F##_PIN), CALC_FAN_SPEED(F));
+      // #define _FAN_SET(F) analogWrite(pin_t(FAN##F##_PIN), CALC_FAN_SPEED(F));
+      #define _FAN_SET(F) //do{ if(CALC_FAN_SPEED(F)>60) can_set_headfan_en(1); else can_set_headfan_en(0); }while(0)
     #endif
-    #define FAN_SET(F) do{ KICKSTART_FAN(F); _FAN_SET(F); }while(0)
+    // #define FAN_SET(F) do{ KICKSTART_FAN(F); _FAN_SET(F); }while(0)
+      #define FAN_SET(F) do{ _FAN_SET(F); }while(0)
 
     TERN_(HAS_FAN0, FAN_SET(0));
     TERN_(HAS_FAN1, FAN_SET(1));
