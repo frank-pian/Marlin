@@ -208,7 +208,20 @@ const char str_t_thermal_runaway[] PROGMEM = STR_T_THERMAL_RUNAWAY,
 
     if (target >= FAN_COUNT) return;
 
-    fan_speed[target] = speed;
+    //fan_speed[target] = speed;
+    if (target == 0) {
+      if (speed) {
+        can_set_headfan_en(1);
+      } else {
+        can_set_headfan_en(0);
+      }
+    } else {
+      if (speed) {
+        can_set_modelfan_en(1);
+      } else {
+        can_set_modelfan_en(0);
+      }
+    }
     report_fan_speed(target);
   }
 
@@ -1194,6 +1207,14 @@ void Temperature::manage_heater() {
 
   #endif // HAS_HEATED_CHAMBER
 
+  //  sht20_update();
+  static uint8_t cnt = 0;
+  cnt++;
+  if (cnt >= 3) {
+    can_temp_update();
+    cnt = 0;
+  }
+
   UNUSED(ms);
 }
 
@@ -1527,7 +1548,8 @@ void Temperature::updateTemperaturesFromRawValues() {
     temp_hotend[1].raw = READ_MAX6675(1);
   #endif
   #if HAS_HOTEND
-    HOTEND_LOOP() temp_hotend[e].celsius = analog_to_celsius_hotend(temp_hotend[e].raw, e);
+    // HOTEND_LOOP() temp_hotend[e].celsius = analog_to_celsius_hotend(temp_hotend[e].raw, e);
+      HOTEND_LOOP() temp_hotend[e].celsius = can_read_temperature(); // read value from can
   #endif
   TERN_(HAS_HEATED_BED, temp_bed.celsius = analog_to_celsius_bed(temp_bed.raw));
   TERN_(HAS_TEMP_CHAMBER, temp_chamber.celsius = analog_to_celsius_chamber(temp_chamber.raw));
@@ -1604,7 +1626,8 @@ void Temperature::init() {
     #ifdef ALFAWISE_UX0
       OUT_WRITE_OD(HEATER_0_PIN, HEATER_0_INVERTING);
     #else
-      OUT_WRITE(HEATER_0_PIN, HEATER_0_INVERTING);
+      // OUT_WRITE(HEATER_0_PIN, HEATER_0_INVERTING);
+      can_set_headpwr_en(HEATER_0_INVERTING);
     #endif
   #endif
 
@@ -1643,10 +1666,10 @@ void Temperature::init() {
   #endif
 
   #if HAS_FAN0
-    INIT_FAN_PIN(FAN_PIN);
+    // INIT_FAN_PIN(FAN_PIN);
   #endif
   #if HAS_FAN1
-    INIT_FAN_PIN(FAN1_PIN);
+    // INIT_FAN_PIN(FAN1_PIN);
   #endif
   #if HAS_FAN2
     INIT_FAN_PIN(FAN2_PIN);
@@ -2224,7 +2247,7 @@ void Temperature::disable_all_heaters() {
 void Temperature::update_raw_temperatures() {
 
   #if HAS_TEMP_ADC_0 && DISABLED(HEATER_0_USES_MAX6675)
-    temp_hotend[0].update();
+    // temp_hotend[0].update();
   #endif
 
   #if HAS_TEMP_ADC_1
@@ -2289,17 +2312,17 @@ void Temperature::readings_ready() {
     LOOP_L_N(e, COUNT(temp_dir)) {
       const int8_t tdir = temp_dir[e];
       if (tdir) {
-        const int16_t rawtemp = temp_hotend[e].raw * tdir; // normal direction, +rawtemp, else -rawtemp
-        const bool heater_on = (temp_hotend[e].target > 0
-          || TERN0(PIDTEMP, temp_hotend[e].soft_pwm_amount) > 0
-        );
-        if (rawtemp > temp_range[e].raw_max * tdir) max_temp_error((heater_ind_t)e);
-        if (heater_on && rawtemp < temp_range[e].raw_min * tdir && !is_preheating(e)) {
-          #ifdef MAX_CONSECUTIVE_LOW_TEMPERATURE_ERROR_ALLOWED
-            if (++consecutive_low_temperature_error[e] >= MAX_CONSECUTIVE_LOW_TEMPERATURE_ERROR_ALLOWED)
-          #endif
-              min_temp_error((heater_ind_t)e);
-        }
+        // const int16_t rawtemp = temp_hotend[e].raw * tdir; // normal direction, +rawtemp, else -rawtemp
+        // const bool heater_on = (temp_hotend[e].target > 0
+        //   || TERN0(PIDTEMP, temp_hotend[e].soft_pwm_amount) > 0
+        // );
+        // if (rawtemp > temp_range[e].raw_max * tdir) max_temp_error((heater_ind_t)e);
+        // if (heater_on && rawtemp < temp_range[e].raw_min * tdir && !is_preheating(e)) {
+        //   #ifdef MAX_CONSECUTIVE_LOW_TEMPERATURE_ERROR_ALLOWED
+        //     if (++consecutive_low_temperature_error[e] >= MAX_CONSECUTIVE_LOW_TEMPERATURE_ERROR_ALLOWED)
+        //   #endif
+        //       min_temp_error((heater_ind_t)e);
+        // }
         #ifdef MAX_CONSECUTIVE_LOW_TEMPERATURE_ERROR_ALLOWED
           else
             consecutive_low_temperature_error[e] = 0;
@@ -2353,6 +2376,9 @@ HAL_TEMP_TIMER_ISR() {
   HAL_timer_isr_prologue(TEMP_TIMER_NUM);
 
   Temperature::tick();
+
+  // call encoder counter
+  encoder_update();
 
   HAL_timer_isr_epilogue(TEMP_TIMER_NUM);
 }
@@ -2441,7 +2467,8 @@ void Temperature::tick() {
 
       #if HAS_HOTEND
         #define _PWM_MOD_E(N) _PWM_MOD(N,soft_pwm_hotend[N],temp_hotend[N]);
-        REPEAT(HOTENDS, _PWM_MOD_E);
+        if (headtype() >= 0x03)
+          REPEAT(HOTENDS, _PWM_MOD_E);
       #endif
 
       #if HAS_HEATED_BED
@@ -2488,7 +2515,8 @@ void Temperature::tick() {
       #define _PWM_LOW(N,S) do{ if (S.count <= pwm_count_tmp) WRITE_HEATER_##N(LOW); }while(0)
       #if HAS_HOTEND
         #define _PWM_LOW_E(N) _PWM_LOW(N, soft_pwm_hotend[N]);
-        REPEAT(HOTENDS, _PWM_LOW_E);
+        if (headtype() >= 0x03)
+          REPEAT(HOTENDS, _PWM_LOW_E);
       #endif
 
       #if HAS_HEATED_BED
@@ -2703,8 +2731,8 @@ void Temperature::tick() {
       break;
 
     #if HAS_TEMP_ADC_0
-      case PrepareTemp_0: HAL_START_ADC(TEMP_0_PIN); break;
-      case MeasureTemp_0: ACCUMULATE_ADC(temp_hotend[0]); break;
+      // case PrepareTemp_0: HAL_START_ADC(TEMP_0_PIN); break;
+      // case MeasureTemp_0: ACCUMULATE_ADC(temp_hotend[0]); break;
     #endif
 
     #if HAS_HEATED_BED
@@ -2946,6 +2974,11 @@ void Temperature::tick() {
         SERIAL_ECHO(getHeaterPower((heater_ind_t)e));
       }
     #endif
+
+    float temp, hum;
+    sht20_get_value(&temp, &hum);
+    serial_echopair_PGM(" M:", temp);
+    serial_echopair_PGM(" H:", hum);
   }
 
   #if ENABLED(AUTO_REPORT_TEMPERATURES)

@@ -590,6 +590,13 @@ class Temperature {
         #endif
         TERN_(AUTO_POWER_CONTROL, powerManager.power_on());
         temp_hotend[ee].target = _MIN(celsius, temp_range[ee].maxtemp - HOTEND_OVERSHOOT);
+        if (temp_hotend[ee].target > 0) {
+          can_set_headpwr_en(1);
+          can_set_target_temperature(temp_hotend[ee].target);
+        } else {
+          can_set_headpwr_en(0);
+          can_set_target_temperature(temp_hotend[ee].target);
+        }
         start_watching_hotend(ee);
       }
 
