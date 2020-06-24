@@ -138,7 +138,7 @@ void Endstops::init() {
 
   #if HAS_Z_MIN
     #if ENABLED(ENDSTOPPULLUP_ZMIN)
-      SET_INPUT_PULLUP(Z_MIN_PIN);
+      // SET_INPUT_PULLUP(Z_MIN_PIN);
     #elif ENABLED(ENDSTOPPULLDOWN_ZMIN)
       SET_INPUT_PULLDOWN(Z_MIN_PIN);
     #else
@@ -431,7 +431,8 @@ void _O2 Endstops::report_states() {
     ES_REPORT(Y2_MAX);
   #endif
   #if HAS_Z_MIN
-    ES_REPORT(Z_MIN);
+    // ES_REPORT(Z_MIN);
+    print_es_state(can_read_zpro() != Z_MIN_ENDSTOP_INVERTING, PSTR(STR_Z_MIN));
   #endif
   #if HAS_Z2_MIN
     ES_REPORT(Z2_MIN);
@@ -578,7 +579,8 @@ void Endstops::update() {
   #endif
 
   #if HAS_Z_MIN && !Z_SPI_SENSORLESS
-    UPDATE_ENDSTOP_BIT(Z, MIN);
+    // UPDATE_ENDSTOP_BIT(Z, MIN);
+    SET_BIT_TO(live_state, Z_MIN, (can_read_zpro() != Z_MIN_ENDSTOP_INVERTING));
     #if ENABLED(Z_MULTI_ENDSTOPS)
       #if HAS_Z2_MIN
         UPDATE_ENDSTOP_BIT(Z2, MIN);

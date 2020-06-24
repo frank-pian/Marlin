@@ -471,7 +471,7 @@ void sht20_get_value(float *temp, float *hum)
 // can bus
 #include "stm32f4xx_hal_can.h"
 
-#define CAN_TIMEOUT   (10)
+#define CAN_TIMEOUT   (100)
 
 CAN_RxHeaderTypeDef rx_msg;
 uint8_t rx_data[8] = {0};
@@ -688,23 +688,15 @@ uint8_t can_read_zpro(void)
   z_pro_flag = 0;
   can_update();
   CAN2_Send_Msg(&data, 1);
-  while((hcan2.Instance->RF0R == 0))
-  {
-    count++;
-    if (count >= CAN_TIMEOUT) {
-        return z_pro;
-    }
-  }
-  while(hcan2.Instance->RF0R == 0);
-  for (count = 0; count > CAN_TIMEOUT; count++) {
-    if (hcan2.Instance->RF0R != 0) {
-        break;
-     }
-  }
-  if (count >= CAN_TIMEOUT) {
-      can_timeout++;
-      return z_pro;
-  }
+  // while((hcan2.Instance->RF0R == 0))
+  // {
+  //   count++;
+  //   if (count >= CAN_TIMEOUT) {
+  //       return z_pro;
+  //   }
+
+  // }
+  DELAY_US(100);
   can_update();
   return z_pro;
 }
