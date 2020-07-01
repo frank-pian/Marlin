@@ -593,17 +593,14 @@ uint8_t can_read_boardtype(void)
   board_type_flag = 0;
   while(hcan2.Instance->RF0R == 0) {
     count++;
-    if (count >= CAN_TIMEOUT) {
+    if (count >= 1000) {
       can_timeout++;
       return board_type;
     }
   }
   can_update();
 
-  if (board_type_flag)
-    return board_type;
-
-  return 0;
+  return board_type;
 }
 
 uint8_t can_read_status(void)
