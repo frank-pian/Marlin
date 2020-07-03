@@ -471,7 +471,7 @@ void sht20_get_value(float *temp, float *hum)
 // can bus
 #include "stm32f4xx_hal_can.h"
 
-#define CAN_TIMEOUT   (100)
+#define CAN_TIMEOUT   (10)
 
 CAN_RxHeaderTypeDef rx_msg;
 uint8_t rx_data[8] = {0};
@@ -547,7 +547,6 @@ void CAN2_RX0_IRQHandler(void)
 void can_update(void)
 {
   volatile  uint32_t count = hcan2.Instance->RF0R;
-  // serial_echopair_PGM("can_update count ", count);
   if (!count) return;
   do {
     // __disable_irq();
@@ -574,7 +573,11 @@ int CAN2_Send_Msg(uint8_t *tx_data, uint8_t len)
       return -1;
     }
   }
-	if (HAL_OK != HAL_CAN_AddTxMessage(&hcan2, &tx_msg, tx_data, (uint32_t*)&TxMailbox)) {
+  // DISABLE_ISRS();
+  HAL_StatusTypeDef status = HAL_CAN_AddTxMessage(&hcan2, &tx_msg, tx_data, (uint32_t*)&TxMailbox);
+  // ENABLE_ISRS();
+
+	if (HAL_OK != status) {
 		return -1;
 	}
 	return 0;
@@ -593,7 +596,7 @@ uint8_t can_read_boardtype(void)
   board_type_flag = 0;
   while(hcan2.Instance->RF0R == 0) {
     count++;
-    if (count >= CAN_TIMEOUT) {
+    if (count >= 1000) {
       can_timeout++;
       return board_type;
     }
@@ -603,7 +606,7 @@ uint8_t can_read_boardtype(void)
   if (board_type_flag)
     return board_type;
 
-  return 0;
+  return board_type;
 }
 
 uint8_t can_read_status(void)
@@ -688,15 +691,17 @@ uint8_t can_read_zpro(void)
   z_pro_flag = 0;
   can_update();
   CAN2_Send_Msg(&data, 1);
-  // while((hcan2.Instance->RF0R == 0))
-  // {
-  //   count++;
-  //   if (count >= CAN_TIMEOUT) {
-  //       return z_pro;
-  //   }
 
-  // }
-  DELAY_US(100);
+  while(hcan2.Instance->RF0R == 0) {
+    count++;
+    if (count >= CAN_TIMEOUT) {
+      can_timeout++;
+      return z_pro;
+    }
+  }
+  // delay(1);
+    // DELAY_US(100);
+
   can_update();
   return z_pro;
 }
@@ -709,18 +714,13 @@ uint8_t can_read_zproxxx(void)
   CAN2_Send_Msg(&data, 1);
   while(hcan2.Instance->RF0R == 0) {
     count++;
-    if (count >= CAN_TIMEOUT) {
+    if (count >= 1500) {
         can_timeout++;
         return z_pro;
       }
   }
 
-  if (hcan2.Instance->RF0R) { 
-    HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &rx_msg, rx_data);
-    if (rx_data[0] == 0xA6)
-      z_pro = rx_data[1];
-  }
-
+  can_update();
   return z_pro;
 }
 

@@ -1207,11 +1207,19 @@ void Temperature::manage_heater() {
 
   #endif // HAS_HEATED_CHAMBER
 
-  //  sht20_update();
   static uint8_t cnt = 0;
+  uint8_t cnt_mod = 0;
   cnt++;
-  if (cnt >= 3) {
+  if (headtype() >= 0x03)  // FDM
+    cnt_mod = 2;
+  else
+    cnt_mod = 5;
+
+  if ((cnt % cnt_mod) == 0) {
     can_temp_update();
+    // cnt = 0;
+  } else if (cnt >= 60) {
+    sht20_update();
     cnt = 0;
   }
 
@@ -1549,7 +1557,7 @@ void Temperature::updateTemperaturesFromRawValues() {
   #endif
   #if HAS_HOTEND
     // HOTEND_LOOP() temp_hotend[e].celsius = analog_to_celsius_hotend(temp_hotend[e].raw, e);
-      HOTEND_LOOP() temp_hotend[e].celsius = can_read_temperature(); // read value from can
+    HOTEND_LOOP() temp_hotend[e].celsius = can_read_temperature(); // read value from can
   #endif
   TERN_(HAS_HEATED_BED, temp_bed.celsius = analog_to_celsius_bed(temp_bed.raw));
   TERN_(HAS_TEMP_CHAMBER, temp_chamber.celsius = analog_to_celsius_chamber(temp_chamber.raw));
