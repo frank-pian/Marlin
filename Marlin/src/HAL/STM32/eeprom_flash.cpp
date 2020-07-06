@@ -230,6 +230,7 @@ bool PersistentStore::access_finish() {
       PAUSE_SERVO_OUTPUT();
       DISABLE_ISRS();
       eeprom_buffer_flush();
+      eeprom_buffer_flush();
       ENABLE_ISRS();
       RESUME_SERVO_OUTPUT();
 

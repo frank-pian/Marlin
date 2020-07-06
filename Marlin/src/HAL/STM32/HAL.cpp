@@ -471,11 +471,12 @@ void sht20_get_value(float *temp, float *hum)
 // can bus
 #include "stm32f4xx_hal_can.h"
 
-#define CAN_TIMEOUT   (100)
+#define CAN_TIMEOUT   (10)
 
 CAN_RxHeaderTypeDef rx_msg;
 uint8_t rx_data[8] = {0};
 CAN_HandleTypeDef hcan2;
+bool can_enable = true;
 
 uint8_t can_timeout = 0;
 uint8_t board_type_flag = 0;
@@ -534,6 +535,7 @@ void CAN2_Init(void)
   // NVIC_EnableIRQ(CAN2_RX0_IRQn);
   // HAL_NVIC_SetPriority(CAN2_RX0_IRQn, 0, 0);
   // HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn);
+  can_enable = true;
 }
 
 void can_parser(void);
@@ -544,10 +546,23 @@ void CAN2_RX0_IRQHandler(void)
   // can_parser();
 }
 
+void set_can_enable(bool enable)
+{
+  can_enable = enable;
+}
+
+bool can_is_enable(void)
+{
+  return can_enable;
+}
+
 void can_update(void)
 {
   volatile  uint32_t count = hcan2.Instance->RF0R;
-  // serial_echopair_PGM("can_update count ", count);
+  
+  if (!can_enable)
+    return;
+
   if (!count) return;
   do {
     // __disable_irq();
@@ -562,6 +577,9 @@ int CAN2_Send_Msg(uint8_t *tx_data, uint8_t len)
 	CAN_TxHeaderTypeDef tx_msg;
   uint32_t TxMailbox = CAN_TX_MAILBOX0;
   uint32_t time = 0;
+
+  if (!can_enable)
+    return 0;
 	
 	tx_msg.StdId = 0x12;
 	tx_msg.ExtId = 0x12;
@@ -574,7 +592,11 @@ int CAN2_Send_Msg(uint8_t *tx_data, uint8_t len)
       return -1;
     }
   }
-	if (HAL_OK != HAL_CAN_AddTxMessage(&hcan2, &tx_msg, tx_data, (uint32_t*)&TxMailbox)) {
+  // DISABLE_ISRS();
+  HAL_StatusTypeDef status = HAL_CAN_AddTxMessage(&hcan2, &tx_msg, tx_data, (uint32_t*)&TxMailbox);
+  // ENABLE_ISRS();
+
+	if (HAL_OK != status) {
 		return -1;
 	}
 	return 0;
@@ -600,6 +622,9 @@ uint8_t can_read_boardtype(void)
   }
   can_update();
 
+  if (board_type_flag)
+    return board_type;
+
   return board_type;
 }
 
@@ -617,9 +642,7 @@ uint8_t can_read_status(void)
   }
   can_update();
 
-  if (status_flag)
     return status;
-  return 0;
 }
 
 float can_read_temperature(void)
@@ -685,15 +708,17 @@ uint8_t can_read_zpro(void)
   z_pro_flag = 0;
   can_update();
   CAN2_Send_Msg(&data, 1);
-  // while((hcan2.Instance->RF0R == 0))
-  // {
-  //   count++;
-  //   if (count >= CAN_TIMEOUT) {
-  //       return z_pro;
-  //   }
 
-  // }
-  DELAY_US(100);
+  while(hcan2.Instance->RF0R == 0) {
+    count++;
+    if (count >= CAN_TIMEOUT) {
+      can_timeout++;
+      return z_pro;
+    }
+  }
+  // delay(1);
+    // DELAY_US(100);
+
   can_update();
   return z_pro;
 }
@@ -706,18 +731,13 @@ uint8_t can_read_zproxxx(void)
   CAN2_Send_Msg(&data, 1);
   while(hcan2.Instance->RF0R == 0) {
     count++;
-    if (count >= CAN_TIMEOUT) {
+    if (count >= 1500) {
         can_timeout++;
         return z_pro;
       }
   }
 
-  if (hcan2.Instance->RF0R) { 
-    HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO0, &rx_msg, rx_data);
-    if (rx_data[0] == 0xA6)
-      z_pro = rx_data[1];
-  }
-
+  can_update();
   return z_pro;
 }
 
@@ -872,8 +892,8 @@ static uint8_t enable_encoder;
 
 void encoder_update(void)
 {
-  // if (!enable_encoder)
-  //   return;
+  if (!enable_encoder)
+    return;
 
   encoder_counter++;
   if (encoder_counter < 10)

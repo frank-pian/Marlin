@@ -50,6 +50,13 @@
  *           3-255 = Set the speed for use with T2
  */
 void GcodeSuite::M106() {
+  
+  if (!parser.seen('P')) {
+    thermalManager.set_fan_speed(0, 1);
+    thermalManager.set_fan_speed(1, 1);
+    return;
+  }
+  
   const uint8_t p = parser.byteval('P', _ALT_P);
 
   if (p < _CNT_P) {
@@ -71,7 +78,8 @@ void GcodeSuite::M106() {
  */
 void GcodeSuite::M107() {
   const uint8_t p = parser.byteval('P', _ALT_P);
-  thermalManager.set_fan_speed(p, 0);
+  thermalManager.set_fan_speed(0, 0);
+  thermalManager.set_fan_speed(1, 0);
 }
 
 #endif // HAS_FAN

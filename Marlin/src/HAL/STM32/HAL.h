@@ -228,6 +228,8 @@ float can_read_temperature(void);
 void can_temp_update(void);
 uint16_t can_read_mpu6500(void);
 uint8_t can_read_zpro(void);
+uint8_t can_read_zproxxx(void);
+void can_update(void);
 
 void can_set_freq(uint16_t freq, uint16_t duty);
 void can_set_pwm(uint8_t duty);

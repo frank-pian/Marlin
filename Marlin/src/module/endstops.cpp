@@ -432,7 +432,7 @@ void _O2 Endstops::report_states() {
   #endif
   #if HAS_Z_MIN
     // ES_REPORT(Z_MIN);
-    print_es_state(can_read_zpro() != Z_MIN_ENDSTOP_INVERTING, PSTR(STR_Z_MIN));
+    print_es_state(can_read_zproxxx() != Z_MIN_ENDSTOP_INVERTING, PSTR(STR_Z_MIN));
   #endif
   #if HAS_Z2_MIN
     ES_REPORT(Z2_MIN);
