@@ -476,6 +476,7 @@ void sht20_get_value(float *temp, float *hum)
 CAN_RxHeaderTypeDef rx_msg;
 uint8_t rx_data[8] = {0};
 CAN_HandleTypeDef hcan2;
+bool can_enable = true;
 
 uint8_t can_timeout = 0;
 uint8_t board_type_flag = 0;
@@ -534,6 +535,7 @@ void CAN2_Init(void)
   // NVIC_EnableIRQ(CAN2_RX0_IRQn);
   // HAL_NVIC_SetPriority(CAN2_RX0_IRQn, 0, 0);
   // HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn);
+  can_enable = true;
 }
 
 void can_parser(void);
@@ -544,9 +546,23 @@ void CAN2_RX0_IRQHandler(void)
   // can_parser();
 }
 
+void set_can_enable(bool enable)
+{
+  can_enable = enable;
+}
+
+bool can_is_enable(void)
+{
+  return can_enable;
+}
+
 void can_update(void)
 {
   volatile  uint32_t count = hcan2.Instance->RF0R;
+  
+  if (!can_enable)
+    return;
+
   if (!count) return;
   do {
     // __disable_irq();
@@ -561,6 +577,9 @@ int CAN2_Send_Msg(uint8_t *tx_data, uint8_t len)
 	CAN_TxHeaderTypeDef tx_msg;
   uint32_t TxMailbox = CAN_TX_MAILBOX0;
   uint32_t time = 0;
+
+  if (!can_enable)
+    return 0;
 	
 	tx_msg.StdId = 0x12;
 	tx_msg.ExtId = 0x12;
@@ -623,9 +642,7 @@ uint8_t can_read_status(void)
   }
   can_update();
 
-  if (status_flag)
     return status;
-  return 0;
 }
 
 float can_read_temperature(void)
@@ -875,8 +892,8 @@ static uint8_t enable_encoder;
 
 void encoder_update(void)
 {
-  // if (!enable_encoder)
-  //   return;
+  if (!enable_encoder)
+    return;
 
   encoder_counter++;
   if (encoder_counter < 10)
