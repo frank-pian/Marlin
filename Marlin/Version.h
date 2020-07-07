@@ -28,7 +28,7 @@
 /**
  * Marlin release version identifier
  */
-//#define SHORT_BUILD_VERSION "bugfix-2.0.x"
+#define SHORT_BUILD_VERSION "V1.0.2-alpha"
 
 /**
  * Verbose version identifier which should contain a reference to the location
@@ -59,7 +59,7 @@
 /**
  * Default generic printer UUID.
  */
-//#define DEFAULT_MACHINE_UUID "cede2a2f-41a2-4748-9b12-c55c62f367ff"
+#define DEFAULT_MACHINE_UUID "cede2a2f-41a2-4748-9b12-c55c62f367ff"
 
 /**
  * The WEBSITE_URL is the location where users can get more information such as

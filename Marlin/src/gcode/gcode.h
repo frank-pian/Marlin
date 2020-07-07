@@ -847,6 +847,7 @@ private:
   TERN_(CONTROLLER_FAN_EDITABLE, static void M710());
 
   static void M1007();
+  static void M2005();
   static void M2051();
   static void M2060();
   static void M2061();
