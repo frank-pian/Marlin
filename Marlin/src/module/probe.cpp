@@ -525,7 +525,7 @@ float Probe::run_z_probe(const bool sanity_check/*=true*/) {
 
     // Do a first probe at the fast speed
     if (try_to_probe(PSTR("FAST"), z_probe_low_point, MMM_TO_MMS(Z_PROBE_SPEED_FAST),
-                     sanity_check, Z_CLEARANCE_BETWEEN_PROBES) ) return NAN;
+      sanity_check, Z_CLEARANCE_BETWEEN_PROBES) ) return NAN;
 
     const float first_probe_z = current_position.z;
 
