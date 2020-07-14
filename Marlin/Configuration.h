@@ -660,7 +660,7 @@
   #define DELTA_DIAGONAL_ROD 357.5        // (mm)
 
   // Distance between bed and nozzle Z home position
-  #define DELTA_HEIGHT 259.5             // (mm) Get this value from G33 auto calibrate
+  #define DELTA_HEIGHT 260             // (mm) Get this value from G33 auto calibrate
 
   #define DELTA_ENDSTOP_ADJ { 0.0, 0.0, 0.0 } // Get these values from G33 auto calibrate
 
@@ -1214,8 +1214,8 @@
 // @section machine
 
 // The size of the print bed
-#define X_BED_SIZE 210
-#define Y_BED_SIZE 210
+#define X_BED_SIZE ((DELTA_PRINTABLE_RADIUS) * 2)
+#define Y_BED_SIZE ((DELTA_PRINTABLE_RADIUS) * 2)
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
 #define POS_MARGIN 0
@@ -1224,7 +1224,7 @@
 #define Z_MIN_POS 0
 #define X_MAX_POS DELTA_PRINTABLE_RADIUS - POS_MARGIN
 #define Y_MAX_POS DELTA_PRINTABLE_RADIUS - POS_MARGIN
-#define Z_MAX_POS 230.6
+#define Z_MAX_POS MANUAL_Z_HOME_POS
 
 /**
  * Software Endstops
@@ -1467,7 +1467,7 @@
 // For DELTA this is the top-center of the Cartesian print volume.
 //#define MANUAL_X_HOME_POS 0
 //#define MANUAL_Y_HOME_POS 0
-//#define MANUAL_Z_HOME_POS 0
+#define MANUAL_Z_HOME_POS DELTA_HEIGHT
 
 // Use "Z Safe Homing" to avoid homing with a Z probe outside the bed area.
 //
