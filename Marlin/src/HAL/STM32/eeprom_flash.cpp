@@ -27,6 +27,7 @@
 #if ENABLED(FLASH_EEPROM_EMULATION)
 
 #include "../shared/eeprom_api.h"
+#include "stm32_eeprom_flash.h"
 
 #if HAS_SERVOS
   #include "Servo.h"
@@ -103,6 +104,12 @@ static bool eeprom_data_written = false;
 #ifndef MARLIN_EEPROM_SIZE
   #define MARLIN_EEPROM_SIZE size_t(E2END + 1)
 #endif
+
+void reset_eeprom_written(void)
+{
+  eeprom_data_written = true;
+}
+
 size_t PersistentStore::capacity() { return MARLIN_EEPROM_SIZE; }
 
 bool PersistentStore::access_start() {
@@ -138,7 +145,7 @@ bool PersistentStore::access_start() {
     }
 
   #else
-    eeprom_buffer_fill();
+    flash_buffer_fill();
   #endif
 
   return true;
@@ -229,8 +236,8 @@ bool PersistentStore::access_finish() {
       // erase.
       PAUSE_SERVO_OUTPUT();
       DISABLE_ISRS();
-      eeprom_buffer_flush();
-      eeprom_buffer_flush();
+      if (flash_buffer_flush())
+        SERIAL_ECHOLNPGM_P("erase error");
       ENABLE_ISRS();
       RESUME_SERVO_OUTPUT();
 
@@ -250,8 +257,8 @@ bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, ui
         eeprom_data_written = true;
       }
     #else
-      if (v != eeprom_buffered_read_byte(pos)) {
-        eeprom_buffered_write_byte(pos, v);
+      if (v != flash_buffered_read_byte(pos)) {
+        flash_buffered_write_byte(pos, v);
         eeprom_data_written = true;
       }
     #endif
@@ -264,7 +271,7 @@ bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, ui
 
 bool PersistentStore::read_data(int &pos, uint8_t* value, size_t size, uint16_t *crc, const bool writing/*=true*/) {
   do {
-    const uint8_t c = TERN(FLASH_EEPROM_LEVELING, ram_eeprom[pos], eeprom_buffered_read_byte(pos));
+    const uint8_t c = TERN(FLASH_EEPROM_LEVELING, ram_eeprom[pos], flash_buffered_read_byte(pos));
     if (writing) *value = c;
     crc16(crc, &c, 1);
     pos++;

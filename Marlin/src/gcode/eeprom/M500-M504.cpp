@@ -24,7 +24,7 @@
 #include "../../module/configuration_store.h"
 #include "../../core/serial.h"
 #include "../../inc/MarlinConfig.h"
-
+#include "../../HAL/STM32/stm32_eeprom_flash.h"
 /**
  * M500: Store settings in EEPROM
  */
@@ -43,7 +43,10 @@ void GcodeSuite::M501() {
  * M502: Revert to default settings
  */
 void GcodeSuite::M502() {
-  (void)settings.reset();
+  change_to_factory_address();
+  (void)settings.load();
+  change_to_user_address();
+  // (void)settings.reset();
 }
 
 #if DISABLED(DISABLE_M503)

@@ -14,7 +14,6 @@
         "0x3748"
       ]
     ],
-    "ldscript": "stm32f407xe.ld",
     "mcu": "stm32f407vet6",
     "variant": "IVI_F407VE"
   },
@@ -56,6 +55,7 @@
       "dfu",
       "jlink"
     ],
+    "offset_address": "0x8010000",
     "require_upload_port": true,
     "use_1200bps_touch": false,
     "wait_for_upload_port": false

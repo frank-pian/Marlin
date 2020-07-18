@@ -861,6 +861,7 @@ private:
   static void M1007();
   static void M2005();
   static void M2051();
+  static void M2050();
   static void M2060();
   static void M2061();
   static void M2053();
