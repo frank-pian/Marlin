@@ -611,6 +611,10 @@ uint8_t can_read_boardtype(void)
 {
   int count = 0;
   uint8_t data = 0xA0;
+
+  if (!can_enable)
+    return 0;
+
   CAN2_Send_Msg(&data, 1);
   board_type_flag = 0;
   while(hcan2.Instance->RF0R == 0) {
@@ -632,6 +636,9 @@ uint8_t can_read_status(void)
 {
   int count = 0;
   uint8_t data = 0xA1;
+  if (!can_enable)
+    return 0;
+
   CAN2_Send_Msg(&data, 1);
   while(hcan2.Instance->RF0R == 0) {
     count++;
@@ -673,6 +680,10 @@ void can_temp_update(void)
   // }
   int count = 0;
   uint8_t data = 0xA2;
+
+  if (!can_enable)
+    return;
+
   CAN2_Send_Msg(&data, 1);
   while(hcan2.Instance->RF0R == 0) {
     count++;
@@ -687,6 +698,10 @@ uint16_t can_read_mpu6500(void)
 {
   int count = 0;
   uint8_t data = 0xA3;
+
+  if (!can_enable)
+    return 0;
+
   CAN2_Send_Msg(&data, 1);
   while(hcan2.Instance->RF0R == 0) {
     count++;
@@ -706,6 +721,12 @@ uint8_t can_read_zpro(void)
   volatile int count = 0;
   uint8_t data = 0xA6;
   z_pro_flag = 0;
+
+  if (!can_enable)
+    return 0;
+
+  
+
   can_update();
   CAN2_Send_Msg(&data, 1);
 
@@ -728,6 +749,10 @@ uint8_t can_read_zproxxx(void)
   int count = 0;
   uint8_t data = 0xA6;
   z_pro_flag = 0;
+
+  if (!can_enable)
+    return 0;
+
   CAN2_Send_Msg(&data, 1);
   while(hcan2.Instance->RF0R == 0) {
     count++;
