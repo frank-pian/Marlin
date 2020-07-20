@@ -34,7 +34,7 @@
   #include "../module/planner.h"
 #endif
 
-#define PCT_TO_PWM(X) ((X) * 255 / 100)
+#define PCT_TO_PWM(X) ((X) * 100 / 100)
 
 #ifndef SPEED_POWER_INTERCEPT
   #define SPEED_POWER_INTERCEPT 0
@@ -174,7 +174,7 @@ public:
   #endif // SPINDLE_LASER_PWM
 
   static inline void set_enabled(const bool enable) {
-    set_power(enable ? TERN(SPINDLE_LASER_PWM, (power ?: (unitPower ? upower_to_ocr(cpwr_to_upwr(SPEED_POWER_STARTUP)) : 0)), 255) : 0);
+    set_power(enable ? TERN(SPINDLE_LASER_PWM, (power ?: (unitPower ? upower_to_ocr(cpwr_to_upwr(SPEED_POWER_STARTUP)) : 0)), 100) : 0);
   }
 
   // Wait for spindle to spin up or spin down
