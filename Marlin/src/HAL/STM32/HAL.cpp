@@ -493,6 +493,7 @@ uint8_t board_type = 0;
 float head_temperature = 0;
 int16_t mpu6500[3] = {0};
 
+bool auto_fan_switch = true;
 
 void CAN2_Init(void)
 {
@@ -669,6 +670,14 @@ float can_read_temperature(void)
   // if (head_temperature_flag)
   //   return head_temperature;
   temp = (float)head_temperature;
+  if (auto_fan_switch) {
+    if (temp > 40){
+      can_set_modelfan_en(1);
+    }else {
+      can_set_modelfan_en(0);
+    }
+  }
+
   return temp;
 }
 

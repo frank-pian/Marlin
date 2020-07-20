@@ -1225,7 +1225,7 @@ void Temperature::manage_heater() {
     can_temp_update();
     // cnt = 0;
   } else if (cnt >= 60) {
-    sht20_update();
+    //sht20_update();
     cnt = 0;
   }
 

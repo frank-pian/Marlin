@@ -222,6 +222,7 @@ void CAN2_RX0_IRQHandler(void);
 float hx710_analog_to_weigh(uint32_t time);
 void sht20_update(void);
 void sht20_get_value(float *temp, float *hum);
+extern bool auto_fan_switch;
 
 uint8_t headtype(void);
 uint8_t can_read_boardtype(void);

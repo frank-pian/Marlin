@@ -860,6 +860,7 @@ private:
 
   static void M1007();
   static void M2005();
+  static void M2006();
   static void M2051();
   static void M2050();
   static void M2060();
