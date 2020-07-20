@@ -58,7 +58,7 @@ void SpindleLaser::init() {
   //   TERN_(MARLIN_DEV_MODE, frequency = SPINDLE_LASER_FREQUENCY);
   // #endif
 
-  can_set_headpwr_en(0x00);
+  can_set_headpwr_en(0x01);
 }
 
 #if ENABLED(SPINDLE_LASER_PWM)
@@ -68,13 +68,13 @@ void SpindleLaser::init() {
   void SpindleLaser::set_ocr(const uint8_t ocr) {
     // WRITE(SPINDLE_LASER_ENA_PIN, SPINDLE_LASER_ACTIVE_HIGH);        // turn spindle on
     // analogWrite(pin_t(SPINDLE_LASER_PWM_PIN), ocr ^ SPINDLE_LASER_PWM_OFF);
-    can_set_headpwr_en(0x01);
+    // can_set_headpwr_en(0x01);
     can_set_pwm(ocr);
   }
   void SpindleLaser::ocr_off() {
     // WRITE(SPINDLE_LASER_ENA_PIN, !SPINDLE_LASER_ACTIVE_HIGH);       // Turn spindle off
     // analogWrite(pin_t(SPINDLE_LASER_PWM_PIN), SPINDLE_LASER_PWM_OFF); // Only write low byte
-    can_set_headpwr_en(0x00);
+    // can_set_headpwr_en(0x00);
     can_set_pwm(0x00);
   }
 #endif

@@ -589,7 +589,7 @@ int CAN2_Send_Msg(uint8_t *tx_data, uint8_t len)
 	tx_msg.DLC = len;
 	while(HAL_CAN_GetTxMailboxesFreeLevel(&hcan2) == 0) { // wait mailbox free
     time++;
-    if (time > 200) {
+    if (time > 500) {
       return -1;
     }
   }
