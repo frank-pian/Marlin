@@ -74,7 +74,8 @@ void GcodeSuite::M3_M4(const bool is_M4) {
                               spwr > 0 ? 100 : 0);
     }
     else
-      cutter.unitPower = cutter.cpwr_to_upwr(SPEED_POWER_STARTUP);
+      // cutter.unitPower = cutter.cpwr_to_upwr(SPEED_POWER_STARTUP);
+      cutter.unitPower = cutter.unitPower ? cutter.unitPower : 0;
     return cutter.unitPower;
   };
 
