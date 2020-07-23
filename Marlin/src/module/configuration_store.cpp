@@ -771,11 +771,26 @@ void MarlinSettings::postprocess() {
         _FIELD_TEST(delta_height);
 
         EEPROM_WRITE(delta_height);              // 1 float
-        EEPROM_WRITE(delta_endstop_adj);         // 3 floats
-        EEPROM_WRITE(delta_radius);              // 1 float
+        if (headtype() == 0x00 || headtype() == 0x02) {
+          EEPROM_WRITE(delta_endstop_adj_bak);         // 3 floats
+        } else {
+          EEPROM_WRITE(delta_endstop_adj);         // 3 floats
+        }
+        if (headtype() == 0x00 || headtype() == 0x02) {
+          EEPROM_WRITE(delta_radius_bak);              // 1 float
+        } else {
+          EEPROM_WRITE(delta_radius);              // 1 float
+        }
+        
         EEPROM_WRITE(delta_diagonal_rod);        // 1 float
         EEPROM_WRITE(delta_segments_per_second); // 1 float
-        EEPROM_WRITE(delta_tower_angle_trim);    // 3 floats
+
+        if (headtype() == 0x00 || headtype() == 0x02) {
+          EEPROM_WRITE(delta_tower_angle_trim_bak);    // 3 floats
+        } else {
+          EEPROM_WRITE(delta_tower_angle_trim);    // 3 floats
+        }
+        
         EEPROM_WRITE(delta_diagonal_rod_trim);   // 3 floats
 
       #elif HAS_EXTRA_ENDSTOPS
@@ -1636,10 +1651,27 @@ void MarlinSettings::postprocess() {
 
           EEPROM_READ(delta_height);              // 1 float
           EEPROM_READ(delta_endstop_adj);         // 3 floats
+          // add check head type 
+          delta_endstop_adj_bak = delta_endstop_adj;
+          if (headtype() == 0x00 || headtype() == 0x02) {
+            abc_float_t temp = DELTA_ENDSTOP_ADJ;
+            delta_endstop_adj = temp;
+          }
           EEPROM_READ(delta_radius);              // 1 float
+          delta_radius_bak = delta_radius;
+          // add check head type 
+          if (headtype() == 0x00 || headtype() == 0x02) {
+            delta_radius = DELTA_RADIUS;
+          }
           EEPROM_READ(delta_diagonal_rod);        // 1 float
           EEPROM_READ(delta_segments_per_second); // 1 float
           EEPROM_READ(delta_tower_angle_trim);    // 3 floats
+          // add check head type 
+          delta_tower_angle_trim_bak = delta_tower_angle_trim;
+          if (headtype() == 0x00 || headtype() == 0x02) {
+            abc_float_t temp = DELTA_TOWER_ANGLE_TRIM;
+            delta_tower_angle_trim = temp;
+          }
           EEPROM_READ(delta_diagonal_rod_trim);   // 3 floats
 
         #elif HAS_EXTRA_ENDSTOPS

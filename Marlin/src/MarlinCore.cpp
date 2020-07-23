@@ -896,6 +896,7 @@ void setup() {
   #endif
 
   SETUP_RUN(HAL_init());
+  can_read_boardtype();
 
   #if HAS_L64XX
     SETUP_RUN(L64xxManager.init());  // Set up SPI, init drivers
@@ -994,7 +995,8 @@ void setup() {
   #if BOTH(SDSUPPORT, SDCARD_EEPROM_EMULATION)
     SETUP_RUN(card.mount());          // Mount media with settings before first_load
   #endif
-
+  
+  can_read_boardtype();
   SETUP_RUN(settings.first_load());   // Load data from EEPROM if available (or use defaults)
                                       // This also updates variables in the planner, elsewhere
 

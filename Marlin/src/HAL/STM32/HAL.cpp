@@ -88,7 +88,7 @@ void HAL_init() {
 
   SetSoftwareSerialTimerInterruptPriority();
 
-  SHT20I2C_Init();
+  // SHT20I2C_Init();
   CAN2_Init();
   misc_pin_init();
   // can_read_boardtype();
@@ -489,7 +489,7 @@ uint8_t mpu6500_flag = 0;
 volatile uint8_t z_pro = 0;
 uint8_t z_pro_int = 0;
 uint8_t status = 0;
-uint8_t board_type = 0;
+uint8_t board_type = 0xff;
 float head_temperature = 0;
 int16_t mpu6500[3] = {0};
 
@@ -537,6 +537,8 @@ void CAN2_Init(void)
   // HAL_NVIC_SetPriority(CAN2_RX0_IRQn, 0, 0);
   // HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn);
   can_enable = true;
+
+  can_read_boardtype();
 }
 
 void can_parser(void);
