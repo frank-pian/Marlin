@@ -894,6 +894,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #endif
 
       case 1007: M1007(); break;
+      case 2007: M2007(); break;
       case 2005: M2005(); break;
       case 2006: M2006(); break;
       case 2051: M2051(); break;
