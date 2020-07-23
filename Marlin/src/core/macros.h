@@ -494,3 +494,11 @@
 #define MAP0(f, x, peek, ...) f(x) MAP_NEXT (peek, MAP1) (f, peek, __VA_ARGS__)
 #define MAP1(f, x, peek, ...) f(x) MAP_NEXT (peek, MAP0) (f, peek, __VA_ARGS__)
 #define MAP(f, ...) EVAL512 (MAP1 (f, __VA_ARGS__, (), 0))
+
+//IVI info
+
+//Head Type
+#define HEAD_TYPE_UNDEFINE 0
+#define HEAD_TYPE_LASER 1
+#define HEAD_TYPE_CNC 2
+#define HEAD_TYPE_3DP 3

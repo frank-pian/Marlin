@@ -59,6 +59,8 @@
 #include "gcode/parser.h"
 #include "gcode/queue.h"
 
+#include "module/Manager.h"
+
 #if ENABLED(TFT_LVGL_UI)
   #include "lvgl.h"
   #include "lcd/extui/lib/mks_ui/tft_lvgl_configuration.h"
@@ -1192,7 +1194,7 @@ void setup() {
 
   marlin_state = MF_RUNNING;
 
-  can_read_boardtype();
+  HeadManager.Init();
 
   SETUP_LOG("setup() completed.");
 }

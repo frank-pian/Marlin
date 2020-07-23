@@ -620,6 +620,7 @@ uint8_t can_read_boardtype(void)
   board_type_flag = 0;
   while(hcan2.Instance->RF0R == 0) {
     count++;
+    delayMicroseconds(1);
     if (count >= 1000) {
       can_timeout++;
       return board_type;
