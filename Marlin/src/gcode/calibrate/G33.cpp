@@ -30,6 +30,7 @@
 #include "../../module/stepper.h"
 #include "../../module/endstops.h"
 #include "../../lcd/ultralcd.h"
+#include "../../module/Manager.h"
 
 #if HAS_BED_PROBE
   #include "../../module/probe.h"
@@ -384,6 +385,11 @@ static float auto_tune_a() {
  *   E   Engage the probe for each point
  */
 void GcodeSuite::G33() {
+
+  if (HeadManager.HeadType != HEAD_TYPE_3DP){
+    SERIAL_ECHOLNPGM_P("warning:Other tool head can't calibration");
+    return;
+  }
 
   const int8_t probe_points = parser.intval('P', DELTA_CALIBRATION_DEFAULT_POINTS);
   if (!WITHIN(probe_points, 0, 10)) {
