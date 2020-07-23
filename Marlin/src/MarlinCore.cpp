@@ -46,6 +46,8 @@
 #include "module/endstops.h"
 #include "module/probe.h"
 #include "module/temperature.h"
+#include "module/Manager.h"
+#include "module/PeripheManager.h"
 #include "sd/cardreader.h"
 #include "module/configuration_store.h"
 #include "module/printcounter.h" // PrintCounter or Stopwatch
@@ -58,8 +60,6 @@
 #include "gcode/gcode.h"
 #include "gcode/parser.h"
 #include "gcode/queue.h"
-
-#include "module/Manager.h"
 
 #if ENABLED(TFT_LVGL_UI)
   #include "lvgl.h"
@@ -753,6 +753,8 @@ void idle(TERN_(ADVANCED_PAUSE_FEATURE, bool no_stepper_sleep/*=false*/)) {
   #if ENABLED(TFT_LVGL_UI)
     LV_TASK_HANDLER();
   #endif
+
+  Periphe.DoorCheckAuto();
 }
 
 /**
@@ -1195,6 +1197,7 @@ void setup() {
   marlin_state = MF_RUNNING;
 
   HeadManager.Init();
+  Periphe.Init();
 
   SETUP_LOG("setup() completed.");
 }
