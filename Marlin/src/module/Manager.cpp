@@ -31,6 +31,26 @@ void Manager::GetHeadType()
         HeadType = HEAD_TYPE_3DP;
         SERIAL_ECHOLNPGM_P("info:Head 3DP,0.3mm");
         break;
+    case 0x04:
+        HeadType = HEAD_TYPE_3DP;
+        SERIAL_ECHOLNPGM_P("info:Head 3DP,0.15mm");
+        break;
+    case 0x05:
+        HeadType = HEAD_TYPE_3DP;
+        SERIAL_ECHOLNPGM_P("info:Head 3DP,0.2mm");
+        break;
+    case 0x06:
+        HeadType = HEAD_TYPE_3DP;
+        SERIAL_ECHOLNPGM_P("info:Head 3DP,0.25mm");
+        break;
+    case 0x07:
+        HeadType = HEAD_TYPE_3DP;
+        SERIAL_ECHOLNPGM_P("info:Head 3DP,0.35mm");
+        break;
+    case 0x08:
+        HeadType = HEAD_TYPE_3DP;
+        SERIAL_ECHOLNPGM_P("info:Head 3DP,0.4mm");
+        break;
     default:
         SERIAL_ECHOLNPGM_P("error:No Print Type Unknown");
         break;

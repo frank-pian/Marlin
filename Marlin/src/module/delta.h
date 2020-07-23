@@ -30,10 +30,13 @@
 
 extern float delta_height;
 extern abc_float_t delta_endstop_adj;
+extern abc_float_t delta_endstop_adj_bak;
 extern float delta_radius,
+             delta_radius_bak,
              delta_diagonal_rod,
              delta_segments_per_second;
 extern abc_float_t delta_tower_angle_trim;
+extern abc_float_t delta_tower_angle_trim_bak;
 extern xy_float_t delta_tower[ABC];
 extern abc_float_t delta_diagonal_rod_2_tower;
 extern float delta_clip_start_height;

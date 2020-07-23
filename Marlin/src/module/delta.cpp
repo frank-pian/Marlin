@@ -52,10 +52,13 @@
 // Initialized by settings.load()
 float delta_height;
 abc_float_t delta_endstop_adj{0};
-float delta_radius,
+abc_float_t delta_endstop_adj_bak{0};
+float delta_radius, 
+      delta_radius_bak,
       delta_diagonal_rod,
       delta_segments_per_second;
 abc_float_t delta_tower_angle_trim;
+abc_float_t delta_tower_angle_trim_bak;
 xy_float_t delta_tower[ABC];
 abc_float_t delta_diagonal_rod_2_tower;
 float delta_clip_start_height = Z_MAX_POS;
