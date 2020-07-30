@@ -48,6 +48,7 @@
 #include "module/temperature.h"
 #include "module/Manager.h"
 #include "module/PeripheManager.h"
+#include "module/StopStepper.h"
 #include "sd/cardreader.h"
 #include "module/configuration_store.h"
 #include "module/printcounter.h" // PrintCounter or Stopwatch
@@ -327,6 +328,10 @@ void quickstop_stepper() {
   planner.synchronize();
   set_current_from_steppers_for_axis(ALL_AXES);
   sync_plan_position();
+}
+
+void stopstepper_trigger() {
+  stopstepper.Trigger(SS_EVENT_PAUSE);
 }
 
 void enable_e_steppers() {
@@ -1229,6 +1234,7 @@ void loop() {
 
     queue.advance();
 
+    stopstepper.Process();
     endstops.event_handler();
 
     TERN_(TFT_LVGL_UI, printer_state_polling());

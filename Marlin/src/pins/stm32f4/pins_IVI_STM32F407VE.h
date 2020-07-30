@@ -166,3 +166,7 @@
 #define ENCODER0_CHB_PIN              PE14
 #define ENCODER0_CHA_PIN              PE15
 
+// power loss
+// #define POWER_CHECK_PIN PE
+#define POWER_LOSS_STATE LOW
+#define POWER_NORMAL_STATE HIGH

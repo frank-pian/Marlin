@@ -395,3 +395,25 @@ void homeaxis(const AxisEnum axis);
 #if HAS_M206_COMMAND
   void set_home_offset(const AxisEnum axis, const float v);
 #endif
+
+void move_to_limited_position(const float  (&target)[XYZE], const float fr_mm_s);
+
+FORCE_INLINE void  move_to_limited_z(const float z, const float fr_mm_s) {
+  float target[XYZE] = {current_position[X_AXIS], current_position[Y_AXIS], z, current_position[E_AXIS]};
+  move_to_limited_position(target, fr_mm_s);
+}
+
+FORCE_INLINE void  move_to_limited_ze(const float z, const float e, const float fr_mm_s) {
+  float target[XYZE] = {current_position[X_AXIS], current_position[Y_AXIS], z, e};
+  move_to_limited_position(target, fr_mm_s);
+}
+
+FORCE_INLINE void  move_to_limited_xy(const float x, const float y, const float fr_mm_s) {
+  float target[XYZE] = {x, y, current_position[Z_AXIS], current_position[E_AXIS]};
+  move_to_limited_position(target, fr_mm_s);
+}
+
+FORCE_INLINE void  move_to_limited_x(const float x, const float fr_mm_s) {
+  float target[XYZE] = {x, current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]};
+  move_to_limited_position(target, fr_mm_s);
+}

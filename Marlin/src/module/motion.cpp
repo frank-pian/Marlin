@@ -1841,3 +1841,32 @@ void homeaxis(const AxisEnum axis) {
     update_workspace_offset(axis);
   }
 #endif // HAS_M206_COMMAND
+
+void  move_to_limited_position(const float (&target)[XYZE], const float fr_mm_s) {
+  const float z_feedrate  = fr_mm_s ? fr_mm_s : homing_feedrate(Z_AXIS),
+            xy_feedrate = fr_mm_s ? fr_mm_s : XY_PROBE_FEEDRATE_MM_S;
+
+  xyz_pos_t dest = {target[X_AXIS], target[Y_AXIS], target[Z_AXIS]};
+  apply_motion_limits(dest);
+
+  // If Z needs to raise, do it before moving XY
+  if (current_position[Z_AXIS] < dest[Z_AXIS]) {
+    current_position[Z_AXIS] = dest[Z_AXIS];
+    line_to_current_position(z_feedrate);
+  }
+
+  current_position[X_AXIS] = dest[X_AXIS];
+  current_position[Y_AXIS] = dest[Y_AXIS];
+  line_to_current_position(xy_feedrate);
+
+  // If Z needs to lower, do it after moving XY
+  if (current_position[Z_AXIS] > dest[Z_AXIS]) {
+    current_position[Z_AXIS] = dest[Z_AXIS];
+    line_to_current_position(z_feedrate);
+  }
+
+  if (current_position[E_AXIS] != target[E_AXIS]) {
+    current_position[E_AXIS] = target[E_AXIS];
+    line_to_current_position(z_feedrate);
+  }
+}

@@ -34,6 +34,7 @@
 // External references
 extern bool wait_for_user, wait_for_heatup;
 void quickstop_stepper();
+void stopstepper_trigger();
 
 class EmergencyParser {
 
@@ -45,6 +46,9 @@ public:
     EP_N,
     EP_M,
     EP_M1,
+    EP_M2,
+    EP_M24,
+    EP_M241,
     EP_M10,
     EP_M108,
     EP_M11,
@@ -52,6 +56,7 @@ public:
     EP_M4,
     EP_M41,
     EP_M410,
+    EP_M2410,
     #if ENABLED(HOST_PROMPT_SUPPORT)
       EP_M8,
       EP_M87,
@@ -101,6 +106,7 @@ public:
         switch (c) {
           case ' ': break;
           case '1': state = EP_M1;     break;
+          case '2': state = EP_M2;     break;
           case '4': state = EP_M4;     break;
           #if ENABLED(HOST_PROMPT_SUPPORT)
             case '8': state = EP_M8;     break;
@@ -113,6 +119,27 @@ public:
         switch (c) {
           case '0': state = EP_M10;    break;
           case '1': state = EP_M11;    break;
+          default: state  = EP_IGNORE;
+        }
+        break;
+
+      case EP_M2:
+        switch (c) {
+          case '4': state = EP_M24;    break;
+          default: state  = EP_IGNORE;
+        }
+        break;
+
+      case EP_M24:
+        switch (c) {
+          case '1': state = EP_M241;    break;
+          default: state  = EP_IGNORE;
+        }
+        break;
+
+      case EP_M241:
+        switch (c) {
+          case '0': state = EP_M2410;    break;
           default: state  = EP_IGNORE;
         }
         break;
@@ -174,6 +201,7 @@ public:
             case EP_M108: wait_for_user = wait_for_heatup = false; break;
             case EP_M112: killed_by_M112 = true; break;
             case EP_M410: quickstop_stepper(); break;
+            case EP_M2410: stopstepper_trigger(); break;
             #if ENABLED(HOST_PROMPT_SUPPORT)
               case EP_M876SN: host_response_handler(M876_reason); break;
             #endif
