@@ -119,8 +119,8 @@
 //#define SD_DETECT_PIN                     PC5
 //#define SD_DETECT_PIN                     PA8   // SDIO SD_DETECT_PIN, external SDIO card reader only
 
-#define BEEPER_PIN                          PD10
-#define LCD_PINS_RS                         PE15
+// #define BEEPER_PIN                          PD10
+// #define LCD_PINS_RS                         PE15
 #define LCD_PINS_ENABLE                     PD8
 #define LCD_PINS_D4                         PE10
 #define LCD_PINS_D5                         PE12
@@ -165,4 +165,6 @@
 #define DOOR_STATUS_PIN               PE3
 #define ENCODER0_CHB_PIN              PE14
 #define ENCODER0_CHA_PIN              PE15
+
+#define  FIL_RUNOUT_PIN               PE14
 

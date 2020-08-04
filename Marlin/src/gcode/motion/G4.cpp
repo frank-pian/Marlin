@@ -29,6 +29,8 @@
  */
 void GcodeSuite::G4() {
   millis_t dwell_ms = 0;
+  uint32_t delta_ms = 0;
+  delta_ms = millis();
 
   if (parser.seenval('P')) dwell_ms = parser.value_millis(); // milliseconds to wait
   if (parser.seenval('S')) dwell_ms = parser.value_millis_from_seconds(); // seconds to wait
@@ -38,7 +40,8 @@ void GcodeSuite::G4() {
     SERIAL_ECHOLNPGM(STR_Z_MOVE_COMP);
   #endif
 
-  if (!ui.has_status()) LCD_MESSAGEPGM(MSG_DWELL);
-
-  dwell(dwell_ms);
+  // if (!ui.has_status()) LCD_MESSAGEPGM(MSG_DWELL);
+  delta_ms = millis() - delta_ms;
+  if ((dwell_ms > delta_ms))
+    dwell(dwell_ms - delta_ms);
 }
