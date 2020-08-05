@@ -4,7 +4,6 @@
 #include "../gcode/gcode.h"
 #include "./Manager.h"
 #include "../module/temperature.h"
-#include "../feature/spindle_laser.h"
 #include "../feature/bedlevel/bedlevel.h"
 #include "../core/debug_out.h"
 
@@ -193,7 +192,7 @@ void StopStepper::TowardStop() {
             if (event_ != SS_EVENT_ISR_POWER_LOSS)
                 idle();
             }
-            cutter.set_enabled(false);
+            //cutter.set_enabled(false);
             }
             break;
 

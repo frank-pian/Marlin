@@ -492,7 +492,7 @@ private:
 
   TERN_(HAS_RESUME_CONTINUE, static void M0_M1());
 
-  #if HAS_CUTTER
+  #if ENABLED(HAS_CUTTER) || ENABLED(IVI_LASER_CNC)
     static void M3_M4(const bool is_M4);
     static void M5();
   #endif

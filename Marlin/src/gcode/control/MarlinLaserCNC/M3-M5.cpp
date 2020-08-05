@@ -24,9 +24,9 @@
 
 #if HAS_CUTTER
 
-#include "../gcode.h"
-#include "../../feature/spindle_laser.h"
-#include "../../module/stepper.h"
+#include "../../gcode.h"
+#include "../../../feature/spindle_laser.h"
+#include "../../../module/stepper.h"
 
 /**
  * Laser:
@@ -65,6 +65,8 @@
  *
  *  PWM duty cycle goes from 0 (off) to 255 (always on).
  */
+u_int32_t test_mils;
+
 void GcodeSuite::M3_M4(const bool is_M4) {
   auto get_s_power = [] {
     if (parser.seenval('S')) {
@@ -113,6 +115,7 @@ void GcodeSuite::M3_M4(const bool is_M4) {
     cutter.set_enabled(true);
   #endif
   cutter.menuPower = cutter.unitPower;
+  test_mils = millis();
 }
 
 /**
@@ -130,6 +133,8 @@ void GcodeSuite::M5() {
   planner.synchronize();
   cutter.set_enabled(false);
   cutter.menuPower = cutter.unitPower;
+  serial_echopair_PGM(" Result:", (millis()-test_mils));
+  SERIAL_EOL();
 }
 
 #endif // HAS_CUTTER

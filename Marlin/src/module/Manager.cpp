@@ -8,6 +8,13 @@ void Manager::Init()
 {
     HeadType = HEAD_TYPE_UNDEFINE;
     GetHeadType();
+
+    switch (HeadType)
+    {
+        case HEAD_TYPE_LASER:
+            Laser.Init();
+            break;
+    }
 }
 
 void Manager::GetHeadType()
