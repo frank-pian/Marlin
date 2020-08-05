@@ -226,7 +226,7 @@ const char str_t_thermal_runaway[] PROGMEM = STR_T_THERMAL_RUNAWAY,
         can_set_modelfan_en(0);
       }
     }
-    report_fan_speed(target);
+    // report_fan_speed(target);
   }
 
   /**
@@ -2397,9 +2397,6 @@ HAL_TEMP_TIMER_ISR() {
 
   Temperature::tick();
 
-  // call encoder counter
-  encoder_update();
-
   HAL_timer_isr_epilogue(TEMP_TIMER_NUM);
 }
 
@@ -3022,10 +3019,10 @@ void Temperature::tick() {
       }
     #endif
 
-    float temp, hum;
-    sht20_get_value(&temp, &hum);
-    serial_echopair_PGM(" M:", temp);
-    serial_echopair_PGM(" H:", hum);
+    // float temp, hum;
+    // sht20_get_value(&temp, &hum);
+    // serial_echopair_PGM(" M:", temp);
+    // serial_echopair_PGM(" H:", hum);
   }
 
   #if ENABLED(AUTO_REPORT_TEMPERATURES)
