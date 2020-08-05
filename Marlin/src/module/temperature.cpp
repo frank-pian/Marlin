@@ -3037,6 +3037,7 @@ void Temperature::tick() {
       if (auto_report_temp_interval && ELAPSED(millis(), next_temp_report_ms)) {
         next_temp_report_ms = millis() + 1000UL * auto_report_temp_interval;
         PORT_REDIRECT(SERIAL_BOTH);
+        SERIAL_ECHOPGM(STR_OK);
         print_heater_states(active_extruder);
         SERIAL_EOL();
       }
