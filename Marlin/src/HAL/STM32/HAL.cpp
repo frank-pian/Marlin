@@ -46,6 +46,7 @@
 // ------------------------
 
 uint16_t HAL_adc_result;  
+bool auto_fan_switch;
 
 // ------------------------
 // Public functions
@@ -473,6 +474,22 @@ void sht20_get_value(float *temp, float *hum)
 
 #define CAN_TIMEOUT   (10)
 
+struct board_status {
+	uint8_t response;
+	struct bs_t {
+		uint8_t head_fan:1;
+		uint8_t model_fan:1;
+		uint8_t head_power:1;
+		uint8_t pwm_duty_s:1;
+		uint8_t zprobe:1;
+		uint8_t temp_runaway:1;
+		uint8_t :2;
+	} bs;
+  uint8_t pwm_duty;
+	uint8_t reserve;
+	float temperature;
+};
+
 CAN_RxHeaderTypeDef rx_msg;
 uint8_t rx_data[8] = {0};
 CAN_HandleTypeDef hcan2;
@@ -488,12 +505,17 @@ uint8_t mpu6500_flag = 0;
 
 volatile uint8_t z_pro = 0;
 uint8_t z_pro_int = 0;
-uint8_t status = 0;
+struct board_status status = {0};
 uint8_t board_type = 0xff;
 float head_temperature = 0;
 int16_t mpu6500[3] = {0};
+uint8_t head_fan = 0;
+uint8_t model_fan = 0;
+uint8_t head_power = 0;
+uint8_t pwm_duty_s = 0;
+uint8_t pwm_duty = 0;
+uint8_t temp_runaway = 0;
 
-bool auto_fan_switch = true;
 
 void CAN2_Init(void)
 {
@@ -648,12 +670,10 @@ uint8_t can_read_status(void)
     count++;
     if (count >= CAN_TIMEOUT) {
       can_timeout++;
-      return status;
     }
   }
   can_update();
-
-    return status;
+  return 0;
 }
 
 float can_read_temperature(void)
@@ -673,13 +693,13 @@ float can_read_temperature(void)
   // if (head_temperature_flag)
   //   return head_temperature;
   temp = (float)head_temperature;
-  if (auto_fan_switch) {
-    if (temp > 40){
-      can_set_modelfan_en(1);
-    }else {
-      can_set_modelfan_en(0);
-    }
-  }
+  // if (auto_fan_switch) {
+  //   if (temp > 40){
+  //     can_set_modelfan_en(1);
+  //   }else {
+  //     can_set_modelfan_en(0);
+  //   }
+  // }
 
   return temp;
 }
@@ -690,6 +710,7 @@ void can_temp_update(void)
   //   head_temperature = -10;
   //   return;
   // }
+   return;
   int count = 0;
   uint8_t data = 0xA2;
 
@@ -730,51 +751,6 @@ uint16_t can_read_mpu6500(void)
 
 uint8_t can_read_zpro(void)
 {
-  volatile int count = 0;
-  uint8_t data = 0xA6;
-  z_pro_flag = 0;
-
-  if (!can_enable)
-    return 0;
-
-  
-
-  can_update();
-  CAN2_Send_Msg(&data, 1);
-
-  while(hcan2.Instance->RF0R == 0) {
-    count++;
-    if (count >= CAN_TIMEOUT) {
-      can_timeout++;
-      return z_pro;
-    }
-  }
-  // delay(1);
-    // DELAY_US(100);
-
-  can_update();
-  return z_pro;
-}
-
-uint8_t can_read_zproxxx(void)
-{
-  int count = 0;
-  uint8_t data = 0xA6;
-  z_pro_flag = 0;
-
-  if (!can_enable)
-    return 0;
-
-  CAN2_Send_Msg(&data, 1);
-  while(hcan2.Instance->RF0R == 0) {
-    count++;
-    if (count >= 1500) {
-        can_timeout++;
-        return z_pro;
-      }
-  }
-
-  can_update();
   return z_pro;
 }
 
@@ -787,7 +763,15 @@ void can_parser(void)
       break;
     }
     case 0xA1: {  // read status (fan on/off, head power on/off)
-      status = rx_data[1];
+      memcpy(&status, &rx_data[0], 8);
+      z_pro = status.bs.zprobe;
+      head_fan = status.bs.head_fan;
+      model_fan = status.bs.model_fan;
+      head_power = status.bs.head_power;
+      pwm_duty_s = status.bs.pwm_duty_s;
+      temp_runaway = status.bs.temp_runaway;
+      head_temperature = status.temperature;
+      pwm_duty = status.pwm_duty;
       status_flag = 1;
       break;
     }
@@ -816,8 +800,7 @@ void can_parser(void)
       break;
     }
     case 0xC0: {  // zpro interrupt
-      z_pro_int = rx_data[1];
-      z_pro_int_flag = 1;
+      z_pro = rx_data[1];
       break;
     }
   }
