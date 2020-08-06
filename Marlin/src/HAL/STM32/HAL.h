@@ -226,6 +226,7 @@ extern bool auto_fan_switch;
 
 uint8_t headtype(void);
 uint8_t can_read_boardtype(void);
+uint8_t can_read_pwm_duty(void);
 float can_read_temperature(void);
 void can_temp_update(void);
 uint16_t can_read_mpu6500(void);

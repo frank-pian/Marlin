@@ -693,13 +693,13 @@ float can_read_temperature(void)
   // if (head_temperature_flag)
   //   return head_temperature;
   temp = (float)head_temperature;
-  // if (auto_fan_switch) {
-  //   if (temp > 40){
-  //     can_set_modelfan_en(1);
-  //   }else {
-  //     can_set_modelfan_en(0);
-  //   }
-  // }
+  if (auto_fan_switch) {
+    if (temp > 40){
+      can_set_modelfan_en(1);
+    }else {
+      can_set_modelfan_en(0);
+    }
+  }
 
   return temp;
 }
@@ -855,9 +855,9 @@ void can_set_modelfan_en(uint8_t enable)
 {
   static uint8_t status = false;
   if ((!!enable) == status) {
-    // return;
+    return;
   }
-  // status = !!enable;
+  status = !!enable;
   uint8_t data[8] = {0};
   data[0] = 0xB4;
   data[1] = enable & 0xff;
