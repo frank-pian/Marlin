@@ -1,5 +1,6 @@
 #include "../inc/MarlinConfig.h"
 
+#include "../HAL/HAL.h";
 #include "../MarlinCore.h"
 #include "LaserManager.h"
 
@@ -21,6 +22,11 @@ void LaserManager::Init()
 void LaserManager::SetPwm(const uint8_t pwm_value)
 {
     can_set_pwm(pwm_value);
+}
+
+uint8_t LaserManager::GetPwm()
+{
+    return can_read_pwm_duty();
 }
 
 void LaserManager::SetPower(float Percent)
@@ -57,10 +63,10 @@ void LaserManager::ChangePowerLimit(float limit) {
   ChangePower(last_percent);
   last_percent = percent;  // recover the value of the normal output
   
-//   if (GetTimPwm() > 0) {
-//     // If there is current output, it is equal to the limit output
-//     setPwm(last_pwm);
-//   }
+  if (GetPwm() > 0) {
+    // If there is current output, it is equal to the limit output
+    SetPwm(last_pwm);
+  }
 }
 
 /**

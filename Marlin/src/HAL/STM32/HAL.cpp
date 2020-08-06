@@ -632,6 +632,11 @@ uint8_t headtype(void)
   return board_type;
 }
 
+uint8_t can_read_pwm_duty()
+{
+  return pwm_duty;
+}
+
 uint8_t can_read_boardtype(void)
 {
   int count = 0;

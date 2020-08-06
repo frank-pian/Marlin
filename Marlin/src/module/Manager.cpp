@@ -29,6 +29,9 @@ void Manager::GetHeadType()
     case 0x01:
         HeadType = HEAD_TYPE_LASER;
         SERIAL_ECHOLNPGM_P("info:Head Laser");
+        SERIAL_ECHO("Current Status: ");
+        SERIAL_ECHOLN((HeadManager.Laser.GetPwm()>4)? "ON" : "OFF");
+        SERIAL_ECHOLNPAIR("Current Power: ", HeadManager.Laser.GetPowerPercent());
         break;
     case 0x02:
         HeadType = HEAD_TYPE_CNC;
