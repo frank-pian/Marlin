@@ -16,7 +16,7 @@ class LaserManager
         void ChangePowerLimit(uint8_t limit);
         void ChangePower(uint8_t percent);
         uint8_t GetPwm();
-        float GetPowerPercent() { return last_percent; }
+        uint8_t GetPowerPercent() { return last_percent; }
 
     private:
         uint8_t  last_pwm;
