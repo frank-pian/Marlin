@@ -46,7 +46,7 @@
 // ------------------------
 
 uint16_t HAL_adc_result;  
-bool auto_fan_switch;
+bool auto_fan_switch = true;
 
 // ------------------------
 // Public functions
