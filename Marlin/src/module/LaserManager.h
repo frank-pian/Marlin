@@ -11,13 +11,15 @@ class LaserManager
         void Init();
         void Off();
         void On();
-        void SetPower(float Percent);
+        void SetPower(uint8_t Percent);
         void SetPwm(uint8_t pwm_value);
-        void ChangePowerLimit(float limit);
-        void ChangePower(float percent);
+        void ChangePowerLimit(uint8_t limit);
+        void ChangePower(uint8_t percent);
+        uint8_t GetPwm();
+        float GetPowerPercent() { return last_percent; }
 
     private:
         uint8_t  last_pwm;
-        float    power_limit_;
-        float    last_percent;
+        uint8_t    power_limit_;
+        uint8_t    last_percent;
 };

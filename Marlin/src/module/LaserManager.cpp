@@ -29,7 +29,7 @@ uint8_t LaserManager::GetPwm()
     return can_read_pwm_duty();
 }
 
-void LaserManager::SetPower(float Percent)
+void LaserManager::SetPower(uint8_t Percent)
 {
     ChangePower(Percent);
     SetPwm(last_pwm);
@@ -54,8 +54,9 @@ void LaserManager::On() {
 /**
  * change power limit, will be call when open / close chamber door
 */
-void LaserManager::ChangePowerLimit(float limit) {
-  float percent = last_percent;
+void LaserManager::ChangePowerLimit(uint8_t limit) 
+{
+  uint8_t percent = last_percent;
   if (limit > LASER_POWER_MAX_LIMIT)
     limit = LASER_POWER_MAX_LIMIT;
   power_limit_ = limit;
@@ -72,10 +73,10 @@ void LaserManager::ChangePowerLimit(float limit) {
 /**
  * change power value, but not change output power
 */
-void LaserManager::ChangePower(float percent)
+void LaserManager::ChangePower(uint8_t percent)
 {
-    int integer;
-    float decimal;
+    //int integer;
+    //float decimal;
     last_percent = percent;
     if (percent > power_limit_)
         percent = power_limit_;
