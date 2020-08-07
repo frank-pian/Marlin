@@ -42,6 +42,17 @@ void GcodeSuite::G4() {
 
   // if (!ui.has_status()) LCD_MESSAGEPGM(MSG_DWELL);
   delta_ms = millis() - delta_ms;
-  if ((dwell_ms > delta_ms))
+  if ((dwell_ms > delta_ms)){
     dwell(dwell_ms - delta_ms);
+    if (DEBUGGING(INFO)){
+      serial_echopair_PGM("dwell_ms: ", (dwell_ms - delta_ms));
+      SERIAL_EOL();
+    }
+  }else {
+    if (DEBUGGING(INFO)){
+      serial_echopair_PGM("G4SYNC_ms: ", (delta_ms - dwell_ms));
+      SERIAL_EOL();
+    }
+  }
+  
 }
