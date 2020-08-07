@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LaserManager.h"
+#include "CNCManager.h"
 
 class Manager
 {
@@ -10,6 +11,7 @@ class Manager
     void GetHeadType();
 
     LaserManager Laser;
+    CNCManager CNC;
 };
 
 extern Manager HeadManager;

@@ -14,6 +14,9 @@ void Manager::Init()
         case HEAD_TYPE_LASER:
             Laser.Init();
             break;
+        case HEAD_TYPE_CNC:
+            CNC.Init();
+            break;
     }
 }
 
@@ -36,6 +39,7 @@ void Manager::GetHeadType()
     case 0x02:
         HeadType = HEAD_TYPE_CNC;
         SERIAL_ECHOLNPGM_P("info:Head CNC");
+        SERIAL_ECHOLNPAIR("Current Power: ", HeadManager.CNC.GetPower());
         break;
     case 0x03:
         HeadType = HEAD_TYPE_3DP;
