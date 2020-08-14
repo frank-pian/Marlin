@@ -95,7 +95,7 @@ void GcodeSuite::M106() {
  * M107: Fan Off
  */
 void GcodeSuite::M107() {
-  const uint8_t p = parser.byteval('P', _ALT_P);
+  //const uint8_t p = parser.byteval('P', _ALT_P);
   thermalManager.set_fan_speed(0, 0);
   thermalManager.set_fan_speed(1, 0);
 }
