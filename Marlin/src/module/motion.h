@@ -230,6 +230,10 @@ void do_blocking_move_to_xy_z(const xy_pos_t &raw, const float &z, const feedRat
 FORCE_INLINE void do_blocking_move_to_xy_z(const xyz_pos_t &raw, const float &z, const feedRate_t &fr_mm_s=0.0f)  { do_blocking_move_to_xy_z(xy_pos_t(raw), z, fr_mm_s); }
 FORCE_INLINE void do_blocking_move_to_xy_z(const xyze_pos_t &raw, const float &z, const feedRate_t &fr_mm_s=0.0f) { do_blocking_move_to_xy_z(xy_pos_t(raw), z, fr_mm_s); }
 
+void do_blocking_move_to_logical_x(const float &rx, const float &fr_mm_s=0);
+void do_blocking_move_to_logical_z(const float &rz, const float &fr_mm_s=0);
+void do_blocking_move_to_logical_xy(const float &rx, const float &ry, const float &fr_mm_s=0);
+
 void remember_feedrate_and_scaling();
 void remember_feedrate_scaling_off();
 void restore_feedrate_and_scaling();
@@ -400,6 +404,11 @@ void move_to_limited_position(const float  (&target)[XYZE], const float fr_mm_s)
 
 FORCE_INLINE void  move_to_limited_z(const float z, const float fr_mm_s) {
   float target[XYZE] = {current_position[X_AXIS], current_position[Y_AXIS], z, current_position[E_AXIS]};
+  move_to_limited_position(target, fr_mm_s);
+}
+
+FORCE_INLINE void  move_to_limited_e(const float e, const float fr_mm_s) {
+  float target[XYZE] = {current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], e};
   move_to_limited_position(target, fr_mm_s);
 }
 

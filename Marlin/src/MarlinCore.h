@@ -123,3 +123,5 @@ extern const char NUL_STR[], M112_KILL_STR[], G28_STR[], M21_STR[], M23_STR[], M
                   SP_A_STR[], SP_B_STR[], SP_C_STR[],
                   SP_P_STR[], SP_T_STR[], SP_X_STR[], SP_Y_STR[], SP_Z_STR[], SP_E_STR[],
                   X_LBL[], Y_LBL[], Z_LBL[], E_LBL[], SP_X_LBL[], SP_Y_LBL[], SP_Z_LBL[], SP_E_LBL[];
+
+#define process_gcode(str) do{parser.parse((char *)str); gcode.process_parsed_command();}while(0)

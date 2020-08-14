@@ -902,7 +902,9 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       case 2049: M2049(); break;
       case 2054: M2054(); break;
       case 2080: M2080(); break;
+      case 2111: M2111(); break;
       case 2410: M2410(); break;
+      case 2411: M2411(); break;
 
       default: parser.unknown_command_warning(); break;
     }

@@ -1,6 +1,6 @@
 #include "../inc/MarlinConfig.h"
 
-#include "../HAL/HAL.h";
+#include "../HAL/HAL.h"
 #include "../MarlinCore.h"
 #include "LaserManager.h"
 

@@ -506,6 +506,16 @@ void do_blocking_move_to_xy_z(const xy_pos_t &raw, const float &z, const feedRat
   do_blocking_move_to(raw.x, raw.y, z, fr_mm_s);
 }
 
+void do_blocking_move_to_logical_x(const float &rx, const float &fr_mm_s/*=0.0*/) {
+  do_blocking_move_to(RAW_X_POSITION(rx), current_position[Y_AXIS], current_position[Z_AXIS], fr_mm_s);
+}
+void do_blocking_move_to_logical_z(const float &rz, const float &fr_mm_s/*=0.0*/) {
+  do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], RAW_Z_POSITION(rz), fr_mm_s);
+}
+void do_blocking_move_to_logical_xy(const float &rx, const float &ry, const float &fr_mm_s/*=0.0*/) {
+  do_blocking_move_to(RAW_X_POSITION(rx), RAW_Y_POSITION(ry), current_position[Z_AXIS], fr_mm_s);
+}
+
 void do_z_clearance(const float &zclear, const bool z_known/*=true*/, const bool raise_on_unknown/*=true*/, const bool lower_allowed/*=false*/) {
   const bool rel = raise_on_unknown && !z_known;
   float zdest = zclear + (rel ? current_position.z : 0.0f);

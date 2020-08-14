@@ -870,7 +870,9 @@ private:
   static void M2049();
   static void M2054();
   static void M2080();
+  static void M2111();
   static void M2410();
+  static void M2411();
 
   static void T(const uint8_t tool_index);
 

@@ -1,10 +1,11 @@
 #include "StopStepper.h"
-#include "./stepper.h"
+#include "stepper.h"
 #include "../gcode/queue.h"
 #include "../gcode/gcode.h"
-#include "./Manager.h"
+#include "Manager.h"
 #include "../module/temperature.h"
 #include "../feature/bedlevel/bedlevel.h"
+#include "StatusManager.h"
 #include "../core/debug_out.h"
 
 StopStepper stopstepper;
@@ -83,15 +84,15 @@ bool StopStepper::CheckISR(block_t *blk) {
         if (blk)
         //powerpanic.SaveCmdLine(blk->filePos);
         set_current_from_steppers_for_axis(ALL_AXES);
-        //powerpanic.SaveEnv();
+        SystemStatus.SaveCurrentPostion();
     }
 
-    // if (new_event == QS_EVENT_ISR_POWER_LOSS) {
-    //     if (SystemStatus.GetCurrentStage() == SYSTAGE_WORK ||
-    //         SystemStatus.GetCurrentStage() == SYSTAGE_PAUSE) {
-    //         powerpanic.WriteFlash();
-    //     }
-    // }
+    if (new_event == SS_EVENT_ISR_POWER_LOSS) {
+        if (SystemStatus.GetSystemStage() == SYSTAGE_WORK ||
+            SystemStatus.GetSystemStage() == SYSTAGE_PAUSE) {
+            //powerpanic.WriteFlash();
+        }
+    }
 
     // so whether event source is power-loss or not, we change sync_flag_ to QS_SYNC_ISR_END
     // then non-ISR env is able to know if we have done ISR
@@ -172,27 +173,28 @@ void StopStepper::TowardStop() {
     switch (HeadManager.HeadType) {
         case HEAD_TYPE_3DP:
             if(thermalManager.temp_hotend[0].celsius > 180)
-            retract = 3;
+            retract = 7;
 
-            current_position[E_AXIS] -= 2;
             line_to_current_position(60);
-            move_to_limited_ze(current_position[Z_AXIS] + 5, current_position[E_AXIS] - retract + 1, 20);
-            move_to_limited_xy(0, Y_MIN_POS, 30);
+            move_to_limited_ze(current_position[Z_AXIS] + 5, current_position[E_AXIS] - retract, 20);
+            //move_to_limited_xy(0, Y_MIN_POS, 30);
+            queue.inject_P(PSTR("G28"));
             break;
 
         case HEAD_TYPE_LASER:
+            HeadManager.Laser.Off();
             break;
 
         case HEAD_TYPE_CNC:
             if (current_position[Z_AXIS] + CNC_SAFE_HIGH_DIFF > Z_MAX_POS) {
-                
+                //太高了就别动
             } else {
                 move_to_limited_z(current_position[Z_AXIS] + CNC_SAFE_HIGH_DIFF, 20);
-            while (planner.has_blocks_queued()) {
-            if (event_ != SS_EVENT_ISR_POWER_LOSS)
-                idle();
-            }
-            //cutter.set_enabled(false);
+                while (planner.has_blocks_queued()) {
+                    if (event_ != SS_EVENT_ISR_POWER_LOSS)
+                        idle();
+                }
+                HeadManager.CNC.Off();
             }
             break;
 
@@ -209,6 +211,11 @@ void StopStepper::TowardStop() {
     if (leveling_active)
         set_bed_leveling_enabled(true);
 }
+
+// void StopStepper::Resume3dp() {
+//     queue.inject_P(PSTR("G28"));
+    
+// }
 
 void StopStepper::Process() {
     if (event_ == SS_EVENT_NONE)
@@ -229,6 +236,18 @@ void StopStepper::Process() {
       // (power-loss && working) or (not power-loss)
     if ((event_ != SS_EVENT_ISR_POWER_LOSS))
         TowardStop();
+
+    if (HeadManager.HeadType == HEAD_TYPE_CNC)
+        HeadManager.CNC.Off();
+
+    if (event_ == SS_EVENT_ISR_POWER_LOSS)
+        while (1);
+
+    if (SystemStatus.GetCurrentStatus() == SYSTAT_PAUSE_TRIG)
+        SystemStatus.SetCurrentStatus(SYSTAT_PAUSE_STOPPED);
+
+    if (SystemStatus.GetCurrentStatus() == SYSTAT_END_TRIG)
+        SystemStatus.SetCurrentStatus(SYSTAT_END_FINISH);
 
     // we have stopped, so clear previous event
     event_ = SS_EVENT_NONE;

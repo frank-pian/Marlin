@@ -46,9 +46,12 @@
 #include "module/endstops.h"
 #include "module/probe.h"
 #include "module/temperature.h"
+#include "module/StatusManager.h"
 #include "module/Manager.h"
 #include "module/PeripheManager.h"
 #include "module/StopStepper.h"
+#include "module/StatusManager.h"
+#include "module/DebugLog.h"
 #include "sd/cardreader.h"
 #include "module/configuration_store.h"
 #include "module/printcounter.h" // PrintCounter or Stopwatch
@@ -331,7 +334,14 @@ void quickstop_stepper() {
 }
 
 void stopstepper_trigger() {
-  stopstepper.Trigger(SS_EVENT_PAUSE);
+  ErrCode err;
+  DEBUG_I("PC trigger pause\n");
+    err = SystemStatus.PauseTrigger(TRIGGER_SOURCE_PC);
+  if (err == E_SUCCESS) {
+    DEBUG_I("trigger pause: ok\n");
+  }else {
+    DEBUG_W("trigger pause failed, err = %d\n", err);
+  }
 }
 
 void enable_e_steppers() {
@@ -869,6 +879,8 @@ void stop() {
  */
 void setup() {
 
+  SystemStatus.Init();
+
   #if ENABLED(MARLIN_DEV_MODE)
     auto log_current_ms = [&](PGM_P const msg) {
       SERIAL_ECHO_START();
@@ -1207,6 +1219,7 @@ void setup() {
   HeadManager.Init();
   Periphe.Init();
 
+  SystemStatus.SetCurrentStatus(SYSTAT_IDLE); // Init completed
   SETUP_LOG("setup() completed.");
 }
 
@@ -1236,6 +1249,7 @@ void loop() {
     queue.advance();
 
     stopstepper.Process();
+    SystemStatus.Process();
     endstops.event_handler();
 
     TERN_(TFT_LVGL_UI, printer_state_polling());
