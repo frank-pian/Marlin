@@ -19,7 +19,7 @@ void CNCManager::On() {
 
 
 void CNCManager::Off() {
-    SetPower(0);
+    can_set_pwm(0);
 }
 
 

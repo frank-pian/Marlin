@@ -18,8 +18,11 @@ void GcodeSuite::M3_M4(const bool is_M4) {
         HeadManager.Laser.On();
       }
     }else if(HEAD_TYPE_CNC == HeadManager.HeadType) {
-          if(parser.seen('S')) HeadManager.CNC.SetPower(parser.value_byte());
-          else HeadManager.CNC.On();
+          if(parser.seen('S')) {
+            HeadManager.CNC.SetPower(parser.value_byte());
+          }else {
+            HeadManager.CNC.On();
+          }
     }
 }
 
